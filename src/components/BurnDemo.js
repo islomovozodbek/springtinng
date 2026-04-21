@@ -52,8 +52,8 @@ export default function BurnDemo() {
           
           // Match the real app's acceleration logic
           const speedMs = Math.max(
-            100, // MIN_DELETE_MS
-            100 + (300 - 100) * Math.exp(-0.001 * timeSinceTrigger)
+            25, // MIN_DELETE_MS
+            25 + (300 - 25) * Math.exp(-0.002 * timeSinceTrigger)
           );
 
           setText((curr) => {

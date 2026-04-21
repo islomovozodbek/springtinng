@@ -26,7 +26,7 @@ const VANISH_TRIGGER_MS = 5000;   // At 5s, deletion starts
 
 // We will slow down the deletion to max ~10 characters per second = ~100ms per character
 const BASE_DELETE_MS = 300;
-const MIN_DELETE_MS = 100;
+const MIN_DELETE_MS = 25;
 
 function SprintPageInner() {
   const { user, loading, updateLocalUser } = useAuth();
@@ -374,7 +374,7 @@ function SprintPageInner() {
               
               const speedMs = Math.max(
                 MIN_DELETE_MS,
-                MIN_DELETE_MS + (BASE_DELETE_MS - MIN_DELETE_MS) * Math.exp(-0.001 * timeSinceTrigger)
+                MIN_DELETE_MS + (BASE_DELETE_MS - MIN_DELETE_MS) * Math.exp(-0.002 * timeSinceTrigger)
               );
 
               setText((curr) => curr.length > 0 ? curr.slice(0, -1) : "");
