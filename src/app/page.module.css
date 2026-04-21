@@ -38,12 +38,12 @@
 
 .heroTitle {
   font-family: var(--font-hero);
-  font-size: 88px;
-  line-height: 1.05;
+  font-size: 72px;
+  line-height: 1.1;
   margin-bottom: var(--space-lg);
   color: var(--text-primary);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   animation: fadeInUp var(--duration-slow) var(--ease-out) 0.1s both;
 }
