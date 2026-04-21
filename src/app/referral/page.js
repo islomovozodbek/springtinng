@@ -24,7 +24,7 @@ export default function ReferralPage() {
     );
   }
 
-  const referralLink = `https://keyboardsprint.com/register?ref=${user.referralCode || "ABC123"}`;
+  const referralLink = `https://sprinting.ink/register?ref=${user.referralCode || "ABC123"}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -45,7 +45,7 @@ export default function ReferralPage() {
         <div className="text-center" style={{ marginBottom: "var(--space-2xl)" }}>
           <h1 style={{ marginBottom: "var(--space-sm)" }}>Refer a Friend</h1>
           <p className="text-muted">
-            Share KeyboardSprint with friends and both of you get free Pro time
+            Share Sprinting.ink with friends and both of you get free Pro time
           </p>
         </div>
 

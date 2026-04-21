@@ -318,7 +318,7 @@ function SprintPageInner() {
       if (!blob) throw new Error("Image generation failed");
       
       const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
-      const fileName = `keyboardsprint_${Date.now()}.png`;
+      const fileName = `sprinting_ink_${Date.now()}.png`;
       const file = new File([blob], fileName, { type: 'image/png' });
       
       const canShare = typeof navigator !== "undefined" && navigator.share && navigator.canShare?.({ files: [file] });
@@ -326,7 +326,7 @@ function SprintPageInner() {
       if (canShare) {
         try {
           await navigator.share({
-            title: "KeyboardSprint Status",
+            title: "Sprinting.ink Status",
             text: `I just wrote ${wordCount} words in ${Math.floor(timerInitialRef.current / 60)} minutes!`,
             files: [file],
           });
@@ -948,7 +948,7 @@ function SprintPageInner() {
                 letterSpacing: "0.25em",
                 textTransform: "uppercase"
               }}>
-                 KeyboardSprints
+                 Sprinting.ink
               </div>
             </div>
           </div>

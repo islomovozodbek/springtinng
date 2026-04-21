@@ -1,5 +1,5 @@
 -- =======================================================
--- KeyboardSprint — Daily Prompt Feature Migration
+-- Sprinting.ink — Daily Prompt Feature Migration
 -- Run this in your Supabase SQL editor:
 -- https://supabase.com/dashboard/project/qugqybqvfhcoyotkuokb/sql/new
 -- =======================================================

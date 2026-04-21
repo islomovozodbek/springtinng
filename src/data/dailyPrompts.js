@@ -1,5 +1,5 @@
 /**
- * KeyboardSprint — Daily Prompts (Curated: 50 best)
+ * Sprinting.ink — Daily Prompts (Curated: 50 best)
  *
  * Criteria for inclusion:
  * - Drops the writer into a specific, concrete moment
