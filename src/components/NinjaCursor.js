@@ -62,7 +62,7 @@ export default function NinjaCursor({ targetRef, isActive = false }) {
       const cursorDragDistance = Math.sqrt(dx * dx + Math.pow(rect.y - lastPos.current.y, 2));
 
       const cursorDragHeight =
-        Math.abs(Math.sin(cursorDragAngle)) * 8 +
+        Math.abs(Math.sin(cursorDragAngle)) * 12 +
         Math.abs(Math.cos(cursorDragAngle)) * rect.height;
       const cursorDragWidth = cursorDragDistance;
 

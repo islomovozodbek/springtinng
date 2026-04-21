@@ -963,7 +963,7 @@ textarea.input {
   top: 0;
   left: 0;
   height: var(--cursor-height);
-  width: 8px;
+  width: 12px;
   display: inline-block;
   user-select: none;
   background-color: var(--text-primary);
@@ -986,7 +986,7 @@ textarea.input {
   user-select: none;
   background: linear-gradient(to right, var(--text-primary), transparent);
   transform: rotate(var(--cursor-drag-angle));
-  transform-origin: 4px center;
+  transform-origin: 6px center;
   opacity: 0.5;
   pointer-events: none;
   will-change: transform, opacity, height, width, transform-origin, background-color;
