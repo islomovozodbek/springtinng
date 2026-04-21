@@ -1,0 +1,346 @@
+.feedPage {
+  min-height: calc(100vh - var(--nav-height));
+  background-color: var(--bg-secondary);
+  padding: 40px 0 80px;
+  text-align: center;
+  margin-bottom: 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.feedHeader {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.feedHeader h1 {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.feedHeader p {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+}
+
+/* ── Discovery Bar ── */
+.discoveryBar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 60px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.searchWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 16px 20px 16px 52px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 1.05rem;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+}
+
+.searchInput:focus {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+
+.categoryGrid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.categoryPill {
+  padding: 8px 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+}
+
+.categoryPill:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.categoryPillActive {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+}
+
+/* ── Story Cards ── */
+.storyList {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.storyCard {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.storyCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
+}
+
+.storyMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.storyAuthor {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.storyTime {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.storyCategory {
+  padding: 4px 10px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.storyTitle {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+  text-align: left;
+}
+
+.storyPrompt {
+  font-family: var(--font-writing);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.storyPreview {
+  font-family: var(--font-writing);
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.storyActions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.voteGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voteBtn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+  padding: 4px;
+}
+
+.voteBtn:hover {
+  color: var(--text-primary);
+}
+
+.voteBtnActive {
+  color: var(--accent);
+}
+
+.voteScore {
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+.readMore {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: 0.95rem;
+}
+
+.focusOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  opacity: 0.98;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+}
+
+.focusContainer {
+  width: 100%;
+  max-width: 800px;
+  padding: 120px 40px;
+  position: relative;
+}
+
+.closeBtn {
+  position: fixed;
+  top: 40px;
+  right: 40px;
+  background: none;
+  border: none;
+  font-size: 3rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: var(--text-primary);
+}
+
+.focusHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.focusMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.focusAuthor {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.playbackBtn {
+  padding: 10px 24px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.playbackBtn:hover {
+  transform: scale(1.05);
+}
+
+.isPlaying {
+  background: var(--danger);
+}
+
+.focusContent {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.focusPrompt {
+  font-family: var(--font-writing);
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.focusBody {
+  font-family: var(--font-writing);
+  font-size: 1.75rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+.focusCursor {
+  display: inline-block;
+  width: 3px;
+  height: 1.4em;
+  background-color: var(--accent);
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.focusFooter {
+  text-align: center;
+  margin-top: 100px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}

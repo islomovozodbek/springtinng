@@ -1,0 +1,614 @@
+/* ============================================
+   KeyboardSprint — Daily Prompt Page
+   ============================================ */
+
+.page {
+  min-height: calc(100vh - var(--nav-height));
+  background: var(--bg-primary);
+  padding: var(--space-4xl) 0;
+}
+
+/* ── Hero Zone ── */
+.hero {
+  text-align: center;
+  padding: var(--space-3xl) 0 var(--space-2xl);
+  position: relative;
+}
+
+.datePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-xl);
+}
+
+.datePill::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+.headline {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+}
+
+/* ── Prompt Display ── */
+.promptBox {
+  max-width: 680px;
+  margin: 0 auto var(--space-3xl);
+  position: relative;
+}
+
+.promptMark {
+  font-family: var(--font-heading);
+  font-size: 4rem;
+  color: var(--border);
+  line-height: 1;
+  margin-bottom: -1.5rem;
+  display: block;
+  user-select: none;
+}
+
+.promptText {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+  padding: var(--space-2xl);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  z-index: 1;
+}
+
+.promptCategory {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-md);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: capitalize;
+  letter-spacing: 0.04em;
+}
+
+/* ── Sealed / Hidden Prompt Box ── */
+.sealedBox {
+  max-width: 540px;
+  margin: 0 auto var(--space-3xl);
+  text-align: center;
+  padding: var(--space-3xl) var(--space-2xl);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-xl);
+  border: 1.5px dashed var(--border-strong);
+  position: relative;
+  overflow: hidden;
+}
+
+.sealedBox::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 12px,
+    rgba(0,0,0,0.015) 12px,
+    rgba(0,0,0,0.015) 24px
+  );
+  pointer-events: none;
+}
+
+.sealedIcon {
+  font-size: 2.8rem;
+  margin-bottom: var(--space-md);
+  display: block;
+  filter: grayscale(0.2);
+}
+
+.sealedTitle {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.sealedSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Countdown + Stats Row ── */
+.statsRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3xl);
+  margin-bottom: var(--space-3xl);
+  flex-wrap: wrap;
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statValue {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+}
+
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+}
+
+/* Countdown ring */
+.countdownTimer {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
+.countdownSvg {
+  width: 72px;
+  height: 72px;
+  transform: rotate(-90deg);
+}
+
+.countdownTrack {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 3;
+}
+
+.countdownProgress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.countdownInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdownHours {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.countdownSub {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── CTA Zone (pre-submission) ── */
+.ctaZone {
+  text-align: center;
+  padding: var(--space-2xl);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  max-width: 520px;
+  margin: 0 auto var(--space-3xl);
+}
+
+.ctaTitle {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+}
+
+.ctaSubtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xl);
+  line-height: 1.6;
+}
+
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 40px;
+  background: var(--accent);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  text-decoration: none;
+  font-family: var(--font-body);
+}
+
+.ctaBtn:hover {
+  background: var(--accent-hover);
+  color: var(--text-inverse);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.ctaHint {
+  margin-top: var(--space-md);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ── Already Submitted Banner ── */
+.submittedBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
+  background: var(--success-soft);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-lg);
+  max-width: 520px;
+  margin: 0 auto var(--space-3xl);
+}
+
+.submittedIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.submittedText h4 {
+  font-size: 1rem;
+  color: var(--success);
+  margin-bottom: 2px;
+}
+
+.submittedText p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Streak Badge ── */
+.streakBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #f97316, #ef4444);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 auto var(--space-xl);
+  display: flex;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Feed Zone (post-submission) ── */
+.feedSection {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.feedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.feedHeader h2 {
+  font-size: 1.2rem;
+}
+
+.feedCount {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Story Cards ── */
+.storyCard {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  transition: all var(--duration-normal) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.storyCard:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.myStoryCard {
+  border-color: var(--accent);
+  background: linear-gradient(
+    135deg,
+    var(--bg-elevated) 0%,
+    var(--accent-soft) 100%
+  );
+}
+
+.myStoryCard::before {
+  content: 'Your Sprint';
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+}
+
+.cardAuthor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.cardAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cardAuthorName {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.cardMeta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 6px;
+}
+
+.storyTitle {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.01em;
+}
+
+.cardContent {
+  font-family: var(--font-writing);
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.cardContent.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.readMoreBtn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--space-sm) 0;
+  margin-top: var(--space-sm);
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+.voteRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.voteBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.voteBtn:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.voteBtnActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-inverse);
+}
+
+.wordCount {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Archive Section ── */
+.archiveSection {
+  max-width: 720px;
+  margin: var(--space-4xl) auto 0;
+  padding-top: var(--space-3xl);
+  border-top: 1px solid var(--border);
+}
+
+.archiveTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xl);
+}
+
+.archiveGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-md);
+}
+
+.archiveCard {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  text-decoration: none;
+  cursor: default;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.archiveDate {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+}
+
+.archivePromptText {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Empty State ── */
+.emptyState {
+  text-align: center;
+  padding: var(--space-3xl);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ── Loading ── */
+.loadingArea {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4xl);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .statsRow {
+    gap: var(--space-xl);
+  }
+
+  .statDivider {
+    display: none;
+  }
+
+  .ctaZone {
+    padding: var(--space-xl);
+  }
+
+  .promptText {
+    font-size: 1.35rem;
+    padding: var(--space-xl);
+  }
+}

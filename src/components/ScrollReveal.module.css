@@ -1,0 +1,38 @@
+.revealWrapper {
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.isReveled {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Animations Configurations */
+.fadeUp {
+  transform: translateY(40px);
+}
+
+.fadeIn {
+  transform: translateY(0);
+}
+
+.slideLeft {
+  transform: translateX(-40px);
+}
+
+.slideRight {
+  transform: translateX(40px);
+}
+
+.scaleUp {
+  transform: scale(0.95);
+}
+
+/* Delay modifiers */
+.delay100 { transition-delay: 100ms; }
+.delay200 { transition-delay: 200ms; }
+.delay300 { transition-delay: 300ms; }
+.delay400 { transition-delay: 400ms; }
+.delay500 { transition-delay: 500ms; }

@@ -1,0 +1,315 @@
+.pricingPage {
+  padding: 100px 0 120px;
+  min-height: calc(100vh - var(--nav-height));
+  background-color: var(--bg-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Artwork */
+.floatingSvg {
+  position: absolute;
+  z-index: 1;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.svgStroke {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawPricingBg 2s ease-in-out forwards;
+}
+
+@keyframes drawPricingBg {
+  to { stroke-dashoffset: 0; }
+}
+
+.pricingSvgLeft {
+  top: 150px;
+  left: -5%; /* Moved further out */
+  width: 20rem;
+  height: 20rem;
+  opacity: 0.2;
+}
+
+.pricingSvgRight {
+  bottom: 50px;
+  right: -10%; /* Moved further out */
+  width: 25rem;
+  height: 25rem;
+  opacity: 0.2;
+}
+
+.pricingSvgMiddleRight {
+  top: 45%;
+  right: -2%;
+  width: 12rem;
+  height: 12rem;
+  opacity: 0.25;
+  transform: translateY(-50%);
+}
+
+.pricingHeader {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.pricingHeader h1 {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.02em;
+}
+
+.pricingHeader p {
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+}
+
+/* ── Minimalist Toggle / Selector ── */
+.plansWrapper {
+  max-width: 900px;
+  margin: 0 auto 100px;
+}
+
+.plansLineup {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+}
+
+/* ── Bear Style Cards ── */
+.planCard {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.planCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+}
+
+.planHeader {
+  display: flex;
+  flex-direction: column;
+  min-height: 160px; /* Reduced since toggle moved */
+}
+
+.planName {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.planPrice {
+  font-family: var(--font-heading);
+  font-size: 2.5rem; /* Slightly smaller to save space */
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px; /* Reduced further */
+}
+
+.planPrice span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* Pricing Duration Toggle */
+.durationToggle {
+  display: flex;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+  margin-top: auto; /* Push it up from the bottom button */
+  margin-bottom: 16px; 
+}
+
+.durationBtn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.durationBtn.active {
+  background: var(--bg-elevated);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.handDrawnCircleContainer {
+  height: 40px; /* Reduced from 48px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0; /* Removed margin */
+}
+
+.handDrawnCircle {
+  position: relative;
+  display: inline-block;
+}
+
+.handDrawnCircleStretched {
+  position: relative;
+  display: inline-block;
+  min-width: 140px; /* Forces the long oval stretch */
+}
+
+.handDrawnCircle span {
+  position: relative;
+  z-index: 2;
+  font-size: 1.15rem; /* Increased to fit better */
+  font-weight: 600;
+  color: var(--danger); /* Bear red accent */
+}
+
+.circleSvg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 155%;
+  height: 180%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.circleSvgStretched {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-1deg);
+  width: 200%; /* The 'ideal' development stretch */
+  height: 250%; 
+  z-index: 1;
+  pointer-events: none;
+}
+
+.circlePath {
+  fill: none;
+  stroke: var(--danger);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: drawCircle 1.5s ease-out forwards;
+}
+
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Features List */
+.planFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  text-align: left;
+  flex-grow: 1;
+}
+
+.planFeatures li {
+  font-size: 1.15rem; /* Increased size (~20%) */
+  color: var(--text-primary); /* Stronger contrast */
+  font-weight: 500; /* Stronger weight */
+  padding: 8px 0;
+  display: flex;
+  gap: 12px;
+  line-height: 1.4;
+}
+
+.checkIcon {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+.planBtn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  width: 100%;
+}
+
+.planBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-primary);
+}
+
+.planBtnPrimary {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: none;
+}
+
+.planBtnPrimary:hover {
+  background: var(--text-secondary);
+}
+
+/* ── FAQ Section ── */
+.faqSection {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.faqSection h2 {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.faqItem {
+  margin-bottom: 24px;
+}
+
+.faqItem h4 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .plansLineup {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .pricingHeader h1 {
+    font-size: 2.5rem;
+  }
+  .plansLineup {
+    flex-direction: column;
+    align-items: center;
+  }
+}

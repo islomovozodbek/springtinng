@@ -1,0 +1,433 @@
+.sprintPage {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  flex-direction: column;
+  transition: background-color 2s ease-in-out;
+  background-color: var(--bg-secondary);
+  position: relative;
+}
+
+.sprintPage.warningZone {
+  background-color: var(--warning-soft);
+}
+
+.sprintPage.dangerZone {
+  background-color: var(--danger-soft);
+}
+
+/* ── Pre-sprint setup ── */
+.setup {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  background-color: var(--bg-secondary);
+}
+
+.setupCard {
+  background-color: var(--bg-primary);
+  padding: var(--space-2xl);
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  animation: fadeInUp var(--duration-slow) var(--ease-out);
+}
+
+.setupCard h1 {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  margin-bottom: var(--space-md);
+  letter-spacing: -0.02em;
+}
+
+.setupCard > p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: var(--space-xl);
+}
+
+.timeSelector {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.timeBtn {
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background-color: transparent;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  color: var(--text-secondary);
+}
+
+.timeBtn:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+.timeBtn.active {
+  background-color: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+.timeBtn.locked {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.proSetupSection {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  text-align: left;
+}
+
+.proHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+}
+
+.proBadge {
+  background: linear-gradient(135deg, var(--accent), #ff8a65);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.customInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.customInputGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.customTimeInput {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.customTimeInput input {
+  width: 80px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  text-align: center;
+  font-size: 1rem;
+}
+
+.customPromptInput {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-writing);
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.customPromptInput:focus, .customTimeInput input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.1);
+}
+
+/* ── Active sprint (Zenpen Style) ── */
+.sprintActive {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 80px var(--space-lg) var(--space-lg);
+}
+
+.sprintHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 60px;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.sprintHeader.hidden {
+  opacity: 0.1;
+}
+
+.sprintHeader:hover {
+  opacity: 1 !important;
+}
+
+.timer {
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  min-width: 60px;
+}
+
+.timerUrgent {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.promptDisplay {
+  font-family: var(--font-writing);
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  flex: 1;
+  padding: 0 var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.rerollBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rerollBtn:hover:not(:disabled) {
+  color: var(--text-primary);
+  background-color: var(--bg-elevated);
+}
+
+.rerollBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.rerollBtn span {
+  font-size: 0.8rem;
+  font-family: var(--font-body);
+  font-style: normal;
+}
+
+/* ── The Writing Area (Mirror Technique) ── */
+.writingArea {
+  position: relative;
+  flex: 1;
+  width: 100%;
+}
+
+.textArea, .textOverlay {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  font-family: var(--font-writing);
+  font-size: 1.35rem;
+  line-height: 1.8;
+  padding: 0 20px 40px 20px; /* Reduced bottom padding to fix jittering on newline wrap */
+  margin: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.textArea::-webkit-scrollbar,
+.textOverlay::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.textOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden; /* CRITICAL for programmatic scroll syncing! */
+  pointer-events: none; /* Let clicks pass through to textarea */
+  color: transparent; /* Text itself is transparent, we render the spans */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.textArea {
+  color: transparent; /* Hide raw text so overlay shows */
+  caret-color: var(--text-primary);
+  z-index: 2;
+  position: relative;
+}
+
+.textArea::placeholder {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Fog of War ── */
+.fogSegment {
+  color: var(--text-primary);
+  transition: filter 1s ease, color 1s ease, opacity 1s ease;
+}
+
+.fogSegment.blurred {
+  filter: blur(2.5px);
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* ── Complete Phase ── */
+.complete {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+}
+
+.completeCard {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 60px 40px;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp var(--duration-slow) var(--ease-out);
+}
+
+.completeIcon {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+  display: block;
+}
+
+.completeCard h1 {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.completeStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+  margin-top: var(--space-xl);
+}
+
+.completeStat {
+  padding: var(--space-lg) var(--space-md);
+  border-bottom: 2px solid var(--border);
+}
+
+.completeStat strong {
+  display: block;
+  font-size: 2.5rem;
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+}
+
+.completeStat span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.feedbackBtns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.feedbackBtn {
+  padding: 10px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.feedbackBtn.selected {
+  border-color: var(--text-primary);
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+/* ── Countdown Overlay ── */
+.countdownOverlay {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.2;
+}
+
+.countdownText {
+  font-family: var(--font-heading);
+  font-size: 20rem;
+  font-weight: 700;
+  color: var(--danger);
+  animation: countdownPulse 1s ease-out forwards;
+}
+
+@keyframes countdownPulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  20% { transform: scale(1.1); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .sprintActive {
+    padding: 40px var(--space-sm) var(--space-md);
+  }
+  .textArea, .textOverlay {
+    font-size: 1.15rem;
+  }
+  .promptDisplay {
+    font-size: 1rem;
+  }
+}

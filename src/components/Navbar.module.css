@@ -1,0 +1,227 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  background-color: rgba(var(--bg-primary-rgb, 10, 9, 8), 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 50;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.nav.scrolled {
+  box-shadow: var(--shadow-sm);
+}
+
+.navInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.logo:hover {
+  opacity: 0.8;
+  color: var(--text-primary);
+}
+
+.logoIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.logoText {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.logoHighlight {
+  color: var(--accent);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  list-style: none;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.navLink:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+.navLink.active {
+  color: var(--accent);
+  background-color: var(--accent-soft);
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.minimalToggle {
+  width: 44px;
+  height: 24px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 3px;
+  cursor: pointer;
+  transition: background-color var(--duration-normal) var(--ease-out), border-color var(--duration-normal) var(--ease-out);
+}
+
+.minimalToggle:hover {
+  border-color: var(--text-muted);
+}
+
+.minimalToggle.isDark {
+  background-color: rgba(255, 255, 255, 0.05); /* Slight elevation glow */
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.minimalKnob {
+  width: 16px;
+  height: 16px;
+  background-color: var(--text-primary);
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer !important; /* Forces pointer instead of grab hand */
+  /* Prevent default touch actions allows physics dragging on mobile without scrolling */
+  touch-action: none;
+}
+
+/* Mobile menu button */
+.menuBtn {
+  display: none;
+  padding: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.menuBtn:hover {
+  background-color: var(--bg-secondary);
+}
+
+.menuIcon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menuIcon span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: 2px;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+/* Mobile overlay */
+.mobileOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(44, 24, 16, 0.2);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+}
+
+.mobileMenu {
+  display: none;
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  background-color: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  z-index: 45;
+  padding: var(--space-md);
+  animation: fadeIn var(--duration-fast) var(--ease-out);
+}
+
+.mobileMenu .navLink {
+  display: flex;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+}
+
+.mobileMenu .navActions {
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-md);
+}
+
+@media (max-width: 768px) {
+  .navLinks {
+    display: none;
+  }
+
+  .navActions {
+    display: none;
+  }
+
+  .menuBtn {
+    display: flex;
+  }
+
+  .mobileOverlay.open {
+    display: block;
+  }
+
+  .mobileMenu.open {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .mobileMenu .navActions {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobileMenu .navActions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

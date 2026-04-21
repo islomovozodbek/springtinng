@@ -1,0 +1,90 @@
+/* ============================================
+   PageShapes — Zen Decorative Background
+   Opacity: 0.4 dominant / 0.22 subtle
+   Stroke: 2.5–3px
+   ============================================ */
+
+.shapesContainer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Two opacity tiers */
+.dominant {
+  opacity: 0.4;
+  position: absolute;
+  pointer-events: none;
+  fill: none;
+  overflow: visible;
+}
+
+.subtle {
+  opacity: 0.22;
+  position: absolute;
+  pointer-events: none;
+  fill: none;
+  overflow: visible;
+}
+
+
+/* ═══════════════════════════════════
+   ANIMATIONS — slow, CSS only, calm
+   ════════════════════════════════════ */
+
+/* Enso: slow stroke draw-on, then holds */
+@keyframes ensoDraw {
+  from { stroke-dashoffset: var(--dash-len); }
+  to   { stroke-dashoffset: 0; }
+}
+
+.ensoAnim path {
+  stroke-dasharray: var(--dash-len, 700);
+  stroke-dashoffset: var(--dash-len, 700);
+  animation: ensoDraw 5.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Arc: stroke draw-on, then holds */
+@keyframes arcDraw {
+  from { stroke-dashoffset: var(--dash-len); }
+  to   { stroke-dashoffset: 0; }
+}
+
+.arcAnim path {
+  stroke-dasharray: var(--dash-len, 600);
+  stroke-dashoffset: var(--dash-len, 600);
+  animation: arcDraw 6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Horizon + TripleStroke: static, no drift */
+.horizonStatic {
+  display: block;
+}
+
+/* Vertical stroke: stillness is the point */
+.vertStatic {
+  display: block;
+}
+
+/* Dot pair: slow fade in, then static */
+@keyframes dotFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.dotFade {
+  animation: dotFadeIn 3s ease-out forwards;
+}
+
+
+/* ═══════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════ */
+@media (max-width: 768px) {
+  .dominant { opacity: 0.3; }
+  .subtle   { opacity: 0.15; }
+}

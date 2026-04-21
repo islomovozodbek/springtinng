@@ -1,0 +1,366 @@
+.pageWrapper {
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  padding: 160px 0 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.heroInner {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.heroBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xl);
+  animation: fadeInDown var(--duration-normal) var(--ease-out);
+}
+
+.heroTitle {
+  font-family: var(--font-heading);
+  font-size: 5rem;
+  line-height: 1.05;
+  margin-bottom: var(--space-lg);
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  animation: fadeInUp var(--duration-slow) var(--ease-out) 0.1s both;
+}
+
+.heroLine {
+  display: block;
+}
+
+.heroAccent {
+  font-style: italic;
+  font-family: var(--font-writing);
+  font-weight: 400;
+  color: var(--accent);
+  position: relative;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto var(--space-xl);
+  animation: fadeInUp var(--duration-slow) var(--ease-out) 0.2s both;
+  font-weight: 400;
+}
+
+.heroCTA {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  animation: fadeInUp var(--duration-slow) var(--ease-out) 0.3s both;
+}
+
+/* ── Notion SVG Animations ── */
+.floatingSvg {
+  position: absolute;
+  opacity: 0.4;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.svgStroke {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawPath 3s ease-in-out forwards;
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.heroSvgLeft {
+  top: 10%;
+  left: 5%;
+  width: 150px;
+  animation: float 6s ease-in-out infinite;
+}
+
+.heroSvgRight {
+  top: 40%;
+  right: 5%;
+  width: 120px;
+  animation: float 8s ease-in-out infinite reverse;
+}
+
+/* ── Split Section (Reedsy Style) ── */
+.splitSection {
+  padding: 80px 0;
+}
+
+.splitSection:nth-of-type(even) {
+  background-color: var(--bg-elevated);
+}
+
+.splitGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.splitReverse .splitGrid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.splitReverse .splitContent {
+  order: 2;
+}
+
+.splitReverse .splitVisual {
+  order: 1;
+}
+
+.splitContent h2 {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-md);
+  line-height: 1.1;
+}
+
+.splitContent p {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xl);
+}
+
+.splitVisual {
+  position: relative;
+}
+
+/* ── Minimalist Diagram / Fake UI ── */
+.browserWindow {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.browserHeader {
+  height: 32px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 6px;
+}
+
+.browserDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+.browserBody {
+  padding: var(--space-2xl);
+  font-family: var(--font-writing);
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  min-height: 300px;
+  position: relative;
+}
+
+.fadingText {
+  color: var(--text-muted);
+  filter: blur(1px);
+  opacity: 0.6;
+}
+
+/* Feature 2: Fog of War Animations */
+.animBlur {
+  animation: blurOut 2.5s forwards;
+  animation-delay: 3s;
+}
+
+.typingContainer {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--accent);
+  vertical-align: bottom;
+  animation: typing 3s steps(30, end) forwards, blinkCursor 1s step-end infinite;
+  max-width: 0;
+  color: var(--text-primary);
+}
+
+@keyframes typing {
+  from { max-width: 0; }
+  to { max-width: 100%; border-color: transparent; }
+}
+
+@keyframes blinkCursor {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--accent); }
+}
+
+@keyframes blurOut {
+  0% { filter: blur(0px); opacity: 1; transform: translateY(0); color: var(--text-primary); }
+  100% { filter: blur(4px); opacity: 0.4; transform: translateY(-3px); color: var(--text-muted); }
+}
+
+/* Feature 3: Pause and Burn Animations */
+.dangerScreen {
+  position: absolute;
+  inset: 0;
+  background-color: var(--danger-soft);
+  opacity: 0;
+  animation: flashDanger 8s infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.dangerText {
+  display: inline-block;
+  color: var(--text-primary);
+  animation: burnText 8s infinite;
+}
+
+@keyframes flashDanger {
+  0%, 50% { opacity: 0; }
+  55% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes burnText {
+  0%, 50% { color: var(--text-primary); filter: blur(0); opacity: 1; transform: translateY(0); }
+  55% { color: var(--danger); filter: blur(0); opacity: 1; }
+  65% { opacity: 0; filter: blur(10px); transform: translateY(-10px); }
+  100% { opacity: 0; filter: blur(10px); transform: translateY(-10px); }
+}
+
+.activeText {
+  color: var(--text-primary);
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background-color: var(--accent);
+  vertical-align: middle;
+  animation: blinkCursor 1s step-end infinite;
+}
+
+/* ── Pricing Teaser ── */
+.pricingTeaser {
+  padding: 80px 0 120px;
+  background-color: var(--bg-secondary);
+}
+
+/* ── Footer ── */
+.footer {
+  background-color: var(--text-inverse);
+  color: var(--text-primary);
+  padding: var(--space-3xl) 0 var(--space-xl);
+  border-top: 1px solid var(--border);
+}
+
+.footerInner {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--space-2xl);
+  margin-bottom: var(--space-3xl);
+}
+
+.footerBrand p {
+  color: var(--text-muted);
+  margin-top: var(--space-md);
+  max-width: 300px;
+}
+
+.footerCol h4 {
+  font-size: 0.95rem;
+  margin-bottom: var(--space-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.footerCol a {
+  display: block;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+  transition: color var(--duration-fast) var(--ease);
+}
+
+.footerCol a:hover {
+  color: var(--text-primary);
+}
+
+.footerBottom {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 992px) {
+  .heroTitle {
+    font-size: 4rem;
+  }
+  .splitGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .splitReverse .splitContent {
+    order: 1;
+  }
+  .splitReverse .splitVisual {
+    order: 2;
+  }
+  .footerInner {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 3.25rem;
+  }
+  .heroSvgLeft, .heroSvgRight {
+    display: none;
+  }
+  .footerInner {
+    grid-template-columns: 1fr;
+  }
+  .footerBottom {
+    flex-direction: column;
+    gap: var(--space-md);
+    text-align: center;
+  }
+}

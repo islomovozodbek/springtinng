@@ -1,0 +1,114 @@
+.authPage {
+  min-height: calc(100vh - var(--nav-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.authCard {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-md);
+  animation: fadeInUp var(--duration-slow) var(--ease-out);
+}
+
+.authHeader {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.authHeader h1 {
+  font-size: 1.75rem;
+  margin-bottom: var(--space-sm);
+}
+
+.authHeader p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.authDivider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin: var(--space-md) 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.authDivider::before,
+.authDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--border);
+}
+
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 12px;
+  background-color: var(--bg-elevated);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  width: 100%;
+}
+
+.googleBtn:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-strong);
+}
+
+.authFooter {
+  text-align: center;
+  margin-top: var(--space-lg);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.authFooter a {
+  font-weight: 600;
+}
+
+.passwordToggle {
+  position: relative;
+}
+
+.passwordToggle input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.passwordToggleBtn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  padding: 4px;
+}
