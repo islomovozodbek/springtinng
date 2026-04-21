@@ -37,14 +37,14 @@
 }
 
 .heroTitle {
-  font-family: var(--font-hero);
-  font-size: 64px;
-  line-height: 1.15;
+  font-family: var(--font-heading);
+  font-size: 5rem;
+  line-height: 1.1;
   margin-bottom: var(--space-lg);
   color: var(--text-primary);
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-transform: none; /* Reverting All Caps */
   animation: fadeInUp var(--duration-slow) var(--ease-out) 0.1s both;
 }
 
@@ -140,12 +140,12 @@
 }
 
 .splitContent h2 {
-  font-family: var(--font-hero);
-  font-size: 3.5rem;
-  letter-spacing: 0.04em;
+  font-family: var(--font-heading);
+  font-size: 3.2rem; /* Slightly larger as requested */
+  letter-spacing: -0.02em;
   margin-bottom: var(--space-md);
-  line-height: 1.05;
-  text-transform: uppercase;
+  line-height: 1.1;
+  text-transform: none;
   font-weight: 600;
 }
 
