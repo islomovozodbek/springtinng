@@ -14,7 +14,7 @@
 }
 
 .heroInner {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   position: relative;
   z-index: 2;
@@ -38,13 +38,13 @@
 
 .heroTitle {
   font-family: var(--font-heading);
-  font-size: 5rem;
+  font-size: 4.6rem;
   line-height: 1.1;
   margin-bottom: var(--space-lg);
   color: var(--text-primary);
   font-weight: 600;
   letter-spacing: -0.02em;
-  text-transform: none; /* Reverting All Caps */
+  text-transform: none; /* Already in JSX as caps */
   animation: fadeInUp var(--duration-slow) var(--ease-out) 0.1s both;
 }
 
@@ -122,7 +122,7 @@
 
 .splitGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.3fr 1.2fr;
   gap: 80px;
   align-items: center;
 }
@@ -141,7 +141,7 @@
 
 .splitContent h2 {
   font-family: var(--font-heading);
-  font-size: 3.2rem; /* Slightly larger as requested */
+  font-size: 3rem;
   letter-spacing: -0.02em;
   margin-bottom: var(--space-md);
   line-height: 1.1;
