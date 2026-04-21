@@ -37,13 +37,13 @@
 }
 
 .heroTitle {
-  font-family: var(--font-heading);
-  font-size: 5rem;
-  line-height: 1.05;
+  font-family: var(--font-body); /* Use clean geometric font */
+  font-size: 3.8rem;
+  line-height: 1.1;
   margin-bottom: var(--space-lg);
   color: var(--text-primary);
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-weight: 300; /* Minimalist and light */
+  letter-spacing: -0.02em;
   animation: fadeInUp var(--duration-slow) var(--ease-out) 0.1s both;
 }
 
@@ -331,7 +331,7 @@
 
 @media (max-width: 992px) {
   .heroTitle {
-    font-size: 4rem;
+    font-size: 3rem;
   }
   .splitGrid {
     grid-template-columns: 1fr;
@@ -350,7 +350,7 @@
 
 @media (max-width: 768px) {
   .heroTitle {
-    font-size: 3.25rem;
+    font-size: 2.5rem;
   }
   .heroSvgLeft, .heroSvgRight {
     display: none;
