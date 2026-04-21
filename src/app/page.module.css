@@ -37,13 +37,14 @@
 }
 
 .heroTitle {
-  font-family: var(--font-body); /* Use clean geometric font */
-  font-size: 3.8rem;
-  line-height: 1.1;
+  font-family: var(--font-hero);
+  font-size: 88px;
+  line-height: 1.05;
   margin-bottom: var(--space-lg);
   color: var(--text-primary);
-  font-weight: 300; /* Minimalist and light */
+  font-weight: 800;
   letter-spacing: -0.02em;
+  text-transform: uppercase;
   animation: fadeInUp var(--duration-slow) var(--ease-out) 0.1s both;
 }
 
