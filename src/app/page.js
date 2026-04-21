@@ -93,7 +93,7 @@ export default function Home() {
 
           <ScrollReveal animation="fadeUp" delay={200}>
             <p className={styles.heroSubtitle}>
-              A minimalist writing game designed to kill perfectionism.
+              Your words disappear if you stop. So don&apos;t stop.
               Get a prompt, write for 3 minutes, and never look back.
             </p>
           </ScrollReveal>
