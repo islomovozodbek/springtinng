@@ -140,11 +140,13 @@
 }
 
 .splitContent h2 {
-  font-family: var(--font-heading);
-  font-size: 3rem;
-  letter-spacing: -0.02em;
+  font-family: var(--font-hero);
+  font-size: 3.5rem;
+  letter-spacing: 0.04em;
   margin-bottom: var(--space-md);
-  line-height: 1.1;
+  line-height: 1.05;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .splitContent p {
