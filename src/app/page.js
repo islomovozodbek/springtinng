@@ -84,9 +84,9 @@ export default function Home() {
 
           <ScrollReveal animation="fadeUp" delay={100}>
             <h1 className={styles.heroTitle}>
-              <span className={styles.heroLine}>WRITE IN</span>
+              <span className={styles.heroLine}>THE LESS YOU FEAR</span>
               <span className={styles.heroLine}>
-                <span className={styles.heroAccent}>3 MINUTES</span> OR DIE
+                THE <span className={styles.heroAccent}>BETTER</span> YOU WRITE
               </span>
             </h1>
           </ScrollReveal>
