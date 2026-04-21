@@ -138,7 +138,7 @@ export default function Home() {
             <ScrollReveal animation="slideRight" delay={100}>
               <h2>The Fog of War.</h2>
               <p>
-                Perfectionism is the enemy of the first draft. In Sprinting.ink, as you type, your older sentences blur out like drying ink. You can&apos;t go back to edit them. You can only move forward.
+                Perfectionism is the enemy of the first draft. In Sprinting Ink, as you type, your older sentences blur out like drying ink. You can&apos;t go back to edit them. You can only move forward.
               </p>
               <Link href="/feed" className="btn btn-secondary mt-4">
                 Read the survivors
@@ -163,7 +163,7 @@ export default function Home() {
             <ScrollReveal animation="slideLeft" delay={100}>
               <h2>Keep moving or burn.</h2>
               <p>
-                Hesitation is death. If you stop typing for 5 seconds, the screen bleeds red, and your current thought burns away forever. Sprinting.ink forces you to bypass your inner critic by making speed your only option.
+                Hesitation is death. If you stop typing for 5 seconds, the screen bleeds red, and your current thought burns away forever. Sprinting Ink forces you to bypass your inner critic by making speed your only option.
               </p>
             </ScrollReveal>
           </div>
@@ -252,7 +252,7 @@ export default function Home() {
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <span style={{ fontSize: "1.5rem" }}>⌨️</span>
                 <span style={{ fontFamily: "var(--font-heading)", fontSize: "1.2rem", fontWeight: 700 }}>
-                  Keyboard<span style={{ color: "var(--accent)" }}>Sprint</span>
+                  sprinting<span style={{ color: "var(--accent)" }}> ink</span>
                 </span>
               </div>
               <p>3-minute creative sprints to train your brain. Forget productivity, embrace creativity.</p>
@@ -274,7 +274,7 @@ export default function Home() {
           </div>
 
           <div className={styles.footerBottom}>
-            <span>© 2026 Sprinting.ink. All rights reserved.</span>
+            <span>© 2026 Sprinting Ink. All rights reserved.</span>
             <span>Minimalist design inspired by focus.</span>
           </div>
         </div>

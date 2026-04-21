@@ -161,8 +161,8 @@ export default function PricingPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h4>What makes Sprinting.ink different from a regular text editor?</h4>
-            <p>Regular editors focus on management and formatting. Sprinting.ink focuses entirely on momentum. Between the &quot;Fog of War&quot; and the &quot;Burn&quot; timer, we provide a psychological safe space where editing is impossible, leaving you with no choice but to create.</p>
+            <h4>What makes Sprinting Ink different from a regular text editor?</h4>
+            <p>Regular editors focus on management and formatting. Sprinting Ink focuses entirely on momentum. Between the &quot;Fog of War&quot; and the &quot;Burn&quot; timer, we provide a psychological safe space where editing is impossible, leaving you with no choice but to create.</p>
           </div>
           
           <div className={styles.faqItem}>

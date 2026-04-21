@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Pricing — Sprinting.ink",
+  title: "Pricing — Sprinting Ink",
   description: "Simple, honest pricing. Upgrade to Pro for unlimited sprints and custom features.",
 };
 

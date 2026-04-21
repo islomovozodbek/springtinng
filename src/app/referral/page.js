@@ -45,7 +45,7 @@ export default function ReferralPage() {
         <div className="text-center" style={{ marginBottom: "var(--space-2xl)" }}>
           <h1 style={{ marginBottom: "var(--space-sm)" }}>Refer a Friend</h1>
           <p className="text-muted">
-            Share Sprinting.ink with friends and both of you get free Pro time
+            Share Sprinting Ink with friends and both of you get free Pro time
           </p>
         </div>
 

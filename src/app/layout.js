@@ -23,12 +23,12 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata = {
-  title: "Sprinting.ink — 3-Minute Creative Writing Sprints",
+  title: "Sprinting Ink — 3-Minute Creative Writing Sprints",
   description:
     "Train your creativity, not your productivity. Get a random prompt, write for 3 minutes, and share your story with the world. Stop typing and your words vanish.",
   keywords: "creative writing, writing sprints, storytelling, writing game, creativity",
   openGraph: {
-    title: "Sprinting.ink — 3-Minute Creative Writing Sprints",
+    title: "Sprinting Ink — 3-Minute Creative Writing Sprints",
     description: "Train your creativity, not your productivity.",
     type: "website",
   },

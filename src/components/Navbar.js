@@ -56,7 +56,7 @@ export default function Navbar() {
           <Link href={user && !user.needsOnboarding ? "/dashboard" : (user?.needsOnboarding ? "#" : "/")} className={styles.logo} onClick={closeMobile} style={{ cursor: user?.needsOnboarding ? "default" : "pointer" }}>
             <span className={styles.logoIcon}>⌨️</span>
             <span className={styles.logoText}>
-              Keyboard<span className={styles.logoHighlight}>Sprint</span>
+              sprinting<span className={styles.logoHighlight}> ink</span>
             </span>
           </Link>
 

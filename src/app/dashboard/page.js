@@ -332,7 +332,7 @@ export default function DashboardPage() {
                   
                   <div className={styles.settingsRow}>
                     <div className={styles.settingLabel}>
-                      <h4>Sprinting.ink Pro</h4>
+                      <h4>Sprinting Ink Pro</h4>
                       <p>Unlock custom UI themes, infinite rerolls, and advanced exports.</p>
                     </div>
                     <div 

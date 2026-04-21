@@ -1,5 +1,5 @@
 /**
- * Sprinting.ink — Daily Prompts (Curated: 50 best)
+ * Sprinting Ink — Daily Prompts (Curated: 50 best)
  *
  * Criteria for inclusion:
  * - Drops the writer into a specific, concrete moment

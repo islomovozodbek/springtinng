@@ -326,7 +326,7 @@ function SprintPageInner() {
       if (canShare) {
         try {
           await navigator.share({
-            title: "Sprinting.ink Status",
+            title: "Sprinting Ink Status",
             text: `I just wrote ${wordCount} words in ${Math.floor(timerInitialRef.current / 60)} minutes!`,
             files: [file],
           });
@@ -948,7 +948,7 @@ function SprintPageInner() {
                 letterSpacing: "0.25em",
                 textTransform: "uppercase"
               }}>
-                 Sprinting.ink
+                 Sprinting Ink
               </div>
             </div>
           </div>

@@ -2,8 +2,8 @@ import Link from "next/link";
 import PageShapes from "@/components/PageShapes";
 
 export const metadata = {
-  title: "About — Sprinting.ink",
-  description: "Learn about Sprinting.ink — a 3-minute creative writing game that trains your creativity, not your productivity.",
+  title: "About — Sprinting Ink",
+  description: "Learn about Sprinting Ink — a 3-minute creative writing game that trains your creativity, not your productivity.",
 };
 
 export default function AboutPage() {
@@ -17,7 +17,7 @@ export default function AboutPage() {
 
       <div className="container" style={{ maxWidth: "700px" }}>
         <div className="text-center" style={{ marginBottom: "var(--space-3xl)" }}>
-          <h1 style={{ marginBottom: "var(--space-md)" }}>About Sprinting.ink</h1>
+          <h1 style={{ marginBottom: "var(--space-md)" }}>About Sprinting Ink</h1>
           <p className="text-lg">
             3-minute creative sprints to train your brain, not your productivity.
           </p>
@@ -27,7 +27,7 @@ export default function AboutPage() {
           <section>
             <h2 style={{ marginBottom: "var(--space-md)" }}>What is this?</h2>
             <p>
-              Sprinting.ink is a creative writing game. You get a random, weird starter sentence. 
+              Sprinting Ink is a creative writing game. You get a random, weird starter sentence. 
               You have 3 minutes to continue it. If you stop typing for 5 seconds, your text starts 
               to vanish — permanently. After time ends, your story goes into a public feed where 
               others can vote on it, read it, and even continue your story.
