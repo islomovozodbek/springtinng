@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import PageShapes from "@/components/PageShapes";
 
 const SHOP_ITEMS = [
@@ -46,25 +46,96 @@ const RARITY_COLORS = {
   legendary: { bg: "#FFEFD6", color: "#8B6914" },
 };
 
+/** Items in "themes" category → unlocked_themes column; everything else → unlocked_accessories */
+function getColumn(item) {
+  return item.category === "themes" ? "unlocked_themes" : "unlocked_accessories";
+}
+
 export default function ShopPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, updateLocalUser } = useAuth();
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("all");
-  const [purchasedItems, setPurchasedItems] = useState(new Set());
+  const [purchasing, setPurchasing] = useState(null); // item id currently being purchased
+  const [toast, setToast] = useState(null); // { message, type: "success" | "error" }
 
+  // Redirect unauthenticated users
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
 
-  const filtered = activeCategory === "all"
-    ? SHOP_ITEMS
-    : SHOP_ITEMS.filter((item) => item.category === activeCategory);
+  // Auto-dismiss toast after 4 seconds
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
-  const handlePurchase = (item) => {
-    if ((user?.aura || 0) < item.price) return;
-    setPurchasedItems((prev) => new Set([...prev, item.id]));
+  /** Derive the set of owned item IDs from the user profile loaded by AuthContext */
+  const ownedIds = useCallback(() => {
+    if (!user) return new Set();
+    const themes = user.unlockedThemes || [];
+    const accessories = user.unlockedAccessories || [];
+    return new Set([...themes, ...accessories]);
+  }, [user]);
+
+  const handlePurchase = async (item) => {
+    if (purchasing) return; // debounce — one purchase at a time
+
+    const owned = ownedIds();
+    if (owned.has(item.id)) return; // already owned
+
+    const currentAura = user?.aura || 0;
+    if (currentAura < item.price) return; // can't afford
+
+    setPurchasing(item.id);
+
+    try {
+      const column = getColumn(item);
+      const currentList =
+        column === "unlocked_themes"
+          ? user.unlockedThemes || []
+          : user.unlockedAccessories || [];
+
+      // Prevent double-writes if somehow triggered twice
+      if (currentList.includes(item.id)) {
+        setToast({ message: "You already own this item!", type: "error" });
+        return;
+      }
+
+      const newList = [...currentList, item.id];
+      const newAura = currentAura - item.price;
+
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          aura: newAura,
+          [column]: newList,
+        })
+        .eq("id", user.uid);
+
+      if (error) throw error;
+
+      // Optimistically update local user state so UI reflects changes immediately
+      const localUpdate = { aura: newAura };
+      if (column === "unlocked_themes") {
+        localUpdate.unlockedThemes = newList;
+      } else {
+        localUpdate.unlockedAccessories = newList;
+      }
+      updateLocalUser(localUpdate);
+
+      setToast({ message: `🎉 "${item.name}" purchased!`, type: "success" });
+    } catch (err) {
+      console.error("Purchase failed:", err);
+      setToast({
+        message: err?.message || "Purchase failed. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setPurchasing(null);
+    }
   };
 
   if (loading || !user) {
@@ -74,6 +145,12 @@ export default function ShopPage() {
       </div>
     );
   }
+
+  const owned = ownedIds();
+  const filtered =
+    activeCategory === "all"
+      ? SHOP_ITEMS
+      : SHOP_ITEMS.filter((item) => item.category === activeCategory);
 
   return (
     <div style={{ padding: "var(--space-2xl) 0", minHeight: "calc(100vh - var(--nav-height))", position: "relative", overflow: "hidden" }}>
@@ -137,8 +214,9 @@ export default function ShopPage() {
           margin: "0 auto",
         }}>
           {filtered.map((item) => {
-            const owned = purchasedItems.has(item.id);
+            const isOwned = owned.has(item.id);
             const canAfford = (user.aura || 0) >= item.price;
+            const isBuying = purchasing === item.id;
             const rarity = RARITY_COLORS[item.rarity];
 
             return (
@@ -147,7 +225,7 @@ export default function ShopPage() {
                 className="card"
                 style={{
                   textAlign: "center",
-                  opacity: owned ? 0.6 : 1,
+                  opacity: isOwned ? 0.65 : 1,
                   position: "relative",
                 }}
               >
@@ -183,17 +261,37 @@ export default function ShopPage() {
                   ⭐ {item.price} Aura
                 </div>
                 <button
-                  className={`btn ${owned ? "btn-ghost" : canAfford ? "btn-primary" : "btn-secondary"} btn-sm w-full`}
-                  disabled={owned || !canAfford}
+                  className={`btn ${isOwned ? "btn-ghost" : canAfford ? "btn-primary" : "btn-secondary"} btn-sm w-full`}
+                  disabled={isOwned || !canAfford || !!purchasing}
                   onClick={() => handlePurchase(item)}
                 >
-                  {owned ? "Owned ✓" : canAfford ? "Purchase" : "Not enough Aura"}
+                  {isBuying ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <span className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} />
+                      Buying…
+                    </span>
+                  ) : isOwned ? "Owned ✓" : canAfford ? "Purchase" : "Not enough Aura"}
                 </button>
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* Toast notification */}
+      {toast && (
+        <div
+          className="toast"
+          style={{
+            borderColor: toast.type === "error" ? "var(--danger)" : "var(--success)",
+            color: toast.type === "error" ? "var(--danger)" : "var(--success)",
+            fontWeight: 600,
+            fontSize: "0.9rem",
+          }}
+        >
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }

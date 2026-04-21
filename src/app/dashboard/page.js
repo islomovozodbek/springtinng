@@ -11,9 +11,13 @@ import { useRouter } from "next/navigation";
 import { CONFIG } from "@/lib/config";
 import PageShapes from "@/components/PageShapes";
 import { getTodayUTC } from "@/data/dailyPrompts";
+import { CATEGORIES } from "@/data/prompts";
+
+// ── Story categories (exclude "all" from the edit dropdown) ────────────────
+const STORY_CATEGORIES = CATEGORIES.filter((c) => c.id !== "all");
 
 export default function DashboardPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, updateLocalUser, logout } = useAuth();
   const router = useRouter();
   const [myStories, setMyStories] = useState([]);
   const [loadingStories, setLoadingStories] = useState(true);
@@ -21,6 +25,34 @@ export default function DashboardPage() {
   const [proEnabled, setProEnabled] = useState(false);
   const [syncingOffline, setSyncingOffline] = useState(false);
   const [offlineSprints, setOfflineSprints] = useState([]);
+
+  // ── Settings state ────────────────────────────────────────────────────
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [savingColor, setSavingColor] = useState(false);
+  const [savingNotif, setSavingNotif] = useState(false);
+
+  // ── Delete Account dialog state ────────────────────────────────────────
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+  // ── Delete dialog state ────────────────────────────────────────────────
+  const [deleteTarget, setDeleteTarget] = useState(null); // story object
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // ── Edit modal state ───────────────────────────────────────────────────
+  const [editTarget, setEditTarget] = useState(null); // story object
+  const [editTitle, setEditTitle] = useState("");
+  const [editCategory, setEditCategory] = useState("general");
+  const [editIsHidden, setEditIsHidden] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // ── Toast ──────────────────────────────────────────────────────────────
+  const [toast, setToast] = useState(null);
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -33,6 +65,7 @@ export default function DashboardPage() {
     }
     if (user) {
       setProEnabled(user.tier === "pro");
+      setEmailNotifications(user.emailNotifications ?? true);
       fetchStories();
       checkOfflineSprints();
     }
@@ -40,11 +73,9 @@ export default function DashboardPage() {
 
   const checkOfflineSprints = () => {
     try {
-      const stored = JSON.parse(localStorage.getItem('offline_sprints') || '[]');
-      if (stored.length > 0) {
-        setOfflineSprints(stored);
-      }
-    } catch(e) {}
+      const stored = JSON.parse(localStorage.getItem("offline_sprints") || "[]");
+      if (stored.length > 0) setOfflineSprints(stored);
+    } catch (e) {}
   };
 
   const syncOfflineSprints = async () => {
@@ -72,7 +103,7 @@ export default function DashboardPage() {
           downvoters: [],
           is_hidden: false,
           chain_part: 1,
-          created_at: new Date(sprint.timestamp).toISOString()
+          created_at: new Date(sprint.timestamp).toISOString(),
         });
 
         if (storyError) throw storyError;
@@ -94,15 +125,14 @@ export default function DashboardPage() {
     }
 
     if (successCount === offlineSprints.length) {
-      localStorage.removeItem('offline_sprints');
+      localStorage.removeItem("offline_sprints");
       setOfflineSprints([]);
     } else if (successCount > 0) {
-      // Keep remaining
       const remaining = offlineSprints.slice(successCount);
-      localStorage.setItem('offline_sprints', JSON.stringify(remaining));
+      localStorage.setItem("offline_sprints", JSON.stringify(remaining));
       setOfflineSprints(remaining);
     }
-    
+
     setSyncingOffline(false);
     if (successCount > 0) fetchStories();
   };
@@ -110,7 +140,6 @@ export default function DashboardPage() {
   const fetchStories = async () => {
     if (!user) return;
     setLoadingStories(true);
-
     try {
       const { data, error } = await supabase
         .from("stories")
@@ -120,26 +149,157 @@ export default function DashboardPage() {
 
       if (error) throw error;
 
-      const stories = (data || []).map(row => ({
-        id: row.id,
-        title: row.title,
-        content: row.content,
-        wordCount: row.word_count,
-        category: row.category,
-        createdAt: row.created_at,
-        isHidden: row.is_hidden,
-        netScore: row.net_score,
-      }));
-      setMyStories(stories);
+      setMyStories(
+        (data || []).map((row) => ({
+          id: row.id,
+          title: row.title,
+          content: row.content,
+          wordCount: row.word_count,
+          category: row.category,
+          createdAt: row.created_at,
+          isHidden: row.is_hidden,
+          netScore: row.net_score,
+        }))
+      );
     } catch (err) {
       console.error("Error fetching stories:", err);
     }
     setLoadingStories(false);
   };
 
-  const handleTogglePro = () => {
-    setProEnabled(!proEnabled);
-    // Logic for updating tier in Firestore would go here
+  // ── Delete handlers ────────────────────────────────────────────────────
+  const openDeleteDialog = (story) => setDeleteTarget(story);
+  const closeDeleteDialog = () => { if (!isDeleting) setDeleteTarget(null); };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget || isDeleting) return;
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("stories")
+        .delete()
+        .eq("id", deleteTarget.id);
+      if (error) throw error;
+
+      // Decrement total_stories on the profile
+      const newTotal = Math.max(0, (user.totalStories || 0) - 1);
+      await supabase
+        .from("profiles")
+        .update({ total_stories: newTotal })
+        .eq("id", user.uid);
+
+      // Update local state
+      updateLocalUser({ totalStories: newTotal });
+      setMyStories((prev) => prev.filter((s) => s.id !== deleteTarget.id));
+      setDeleteTarget(null);
+      setToast({ message: "Sprint deleted.", type: "success" });
+    } catch (err) {
+      console.error("Delete failed:", err);
+      setToast({ message: err?.message || "Delete failed. Please try again.", type: "error" });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // ── Edit handlers ──────────────────────────────────────────────────────
+  const openEditModal = (story) => {
+    setEditTarget(story);
+    setEditTitle(story.title || "");
+    setEditCategory(story.category || "general");
+    setEditIsHidden(story.isHidden || false);
+  };
+  const closeEditModal = () => { if (!isSaving) setEditTarget(null); };
+
+  const confirmEdit = async () => {
+    if (!editTarget || isSaving) return;
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("stories")
+        .update({
+          title: editTitle.trim() || "Untitled Sprint",
+          category: editCategory,
+          is_hidden: editIsHidden,
+        })
+        .eq("id", editTarget.id);
+      if (error) throw error;
+
+      // Update the local stories list in-place
+      setMyStories((prev) =>
+        prev.map((s) =>
+          s.id === editTarget.id
+            ? { ...s, title: editTitle.trim() || "Untitled Sprint", category: editCategory, isHidden: editIsHidden }
+            : s
+        )
+      );
+      setEditTarget(null);
+      setToast({ message: "Changes saved.", type: "success" });
+    } catch (err) {
+      console.error("Edit failed:", err);
+      setToast({ message: err?.message || "Save failed. Please try again.", type: "error" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleTogglePro = () => setProEnabled(!proEnabled);
+
+  // ── Settings handlers ──────────────────────────────────────────────────
+  const saveProfileColor = async (color) => {
+    if (savingColor) return;
+    setSavingColor(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ profile_color: color })
+        .eq("id", user.uid);
+      if (error) throw error;
+      updateLocalUser({ profileColor: color });
+      setToast({ message: "Username color saved.", type: "success" });
+    } catch (err) {
+      console.error("saveProfileColor failed:", err);
+      setToast({ message: err?.message || "Failed to save color.", type: "error" });
+    } finally {
+      setSavingColor(false);
+    }
+  };
+
+  const toggleEmailNotifications = async () => {
+    if (savingNotif) return;
+    const next = !emailNotifications;
+    setSavingNotif(true);
+    setEmailNotifications(next); // optimistic
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ email_notifications: next })
+        .eq("id", user.uid);
+      if (error) throw error;
+      updateLocalUser({ emailNotifications: next });
+      setToast({ message: next ? "Notifications enabled." : "Notifications disabled.", type: "success" });
+    } catch (err) {
+      console.error("toggleEmailNotifications failed:", err);
+      setEmailNotifications(!next); // rollback
+      setToast({ message: err?.message || "Failed to save preference.", type: "error" });
+    } finally {
+      setSavingNotif(false);
+    }
+  };
+
+  const confirmDeleteAccount = async () => {
+    if (isDeletingAccount) return;
+    setIsDeletingAccount(true);
+    try {
+      const { error } = await supabase.rpc("delete_own_account");
+      if (error) throw error;
+      await logout();
+      router.push("/");
+    } catch (err) {
+      console.error("Delete account failed:", err);
+      setToast({ message: err?.message || "Account deletion failed. Please try again.", type: "error" });
+      setIsDeletingAccount(false);
+      setShowDeleteAccount(false);
+    }
   };
 
   if (authLoading || !user) {
@@ -151,14 +311,14 @@ export default function DashboardPage() {
       <PageShapes page="dashboard" />
 
       <div className="container">
-        
+
         {/* Profile Header */}
         <ScrollReveal animation="fadeUp">
           <div className={styles.profileHeader}>
             <div className={styles.profileAvatar}>
               {(user.username || user.email || "U")[0].toUpperCase()}
             </div>
-            
+
             <div className={styles.profileInfo}>
               <div className={styles.profileName}>
                 <span className={proEnabled ? `username-pro username-color-${user.profileColor}` : ""}>
@@ -240,16 +400,16 @@ export default function DashboardPage() {
 
         {/* Dashboard Content */}
         <div className={styles.dashContent}>
-          
+
           <ScrollReveal animation="fadeUp" delay={100}>
             <aside className={styles.sidebar}>
-              <button 
+              <button
                 className={`${styles.navItem} ${activeTab === "library" ? styles.navItemActive : ""}`}
                 onClick={() => setActiveTab("library")}
               >
                 📚 My Library
               </button>
-              <button 
+              <button
                 className={`${styles.navItem} ${activeTab === "settings" ? styles.navItemActive : ""}`}
                 onClick={() => setActiveTab("settings")}
               >
@@ -267,16 +427,12 @@ export default function DashboardPage() {
                 </div>
 
                 {offlineSprints.length > 0 && (
-                  <div style={{ backgroundColor: 'var(--warning-soft)', border: '1px solid var(--warning)', padding: '16px', borderRadius: '8px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ backgroundColor: "var(--warning-soft)", border: "1px solid var(--warning)", padding: "16px", borderRadius: "8px", marginBottom: "24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <h4 style={{ color: 'var(--warning)', margin: '0 0 4px 0' }}>Offline Sprints Detected</h4>
-                      <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>You have {offlineSprints.length} sprint(s) waiting to be uploaded.</p>
+                      <h4 style={{ color: "var(--warning)", margin: "0 0 4px 0" }}>Offline Sprints Detected</h4>
+                      <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--text-secondary)" }}>You have {offlineSprints.length} sprint(s) waiting to be uploaded.</p>
                     </div>
-                    <button 
-                      className="btn btn-primary btn-sm" 
-                      onClick={syncOfflineSprints} 
-                      disabled={syncingOffline}
-                    >
+                    <button className="btn btn-primary btn-sm" onClick={syncOfflineSprints} disabled={syncingOffline}>
                       {syncingOffline ? "Syncing..." : "Sync Now"}
                     </button>
                   </div>
@@ -312,8 +468,19 @@ export default function DashboardPage() {
                           </p>
                         </div>
                         <div className={styles.storyActions}>
-                          <button className={styles.actionBtn}>Edit</button>
-                          <button className={styles.actionBtn} style={{ color: "var(--danger)", borderColor: "var(--danger-soft)" }}>Delete</button>
+                          <button
+                            className={styles.actionBtn}
+                            onClick={() => openEditModal(story)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className={styles.actionBtn}
+                            style={{ color: "var(--danger)", borderColor: "var(--danger-soft)" }}
+                            onClick={() => openDeleteDialog(story)}
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     ))
@@ -329,13 +496,13 @@ export default function DashboardPage() {
 
                 <div className={styles.settingsSection}>
                   <h3>Pro Features</h3>
-                  
+
                   <div className={styles.settingsRow}>
                     <div className={styles.settingLabel}>
                       <h4>Sprinting Ink Pro</h4>
                       <p>Unlock custom UI themes, infinite rerolls, and advanced exports.</p>
                     </div>
-                    <div 
+                    <div
                       className={`${styles.toggleSwitch} ${proEnabled ? styles.active : ""}`}
                       onClick={handleTogglePro}
                     >
@@ -348,7 +515,13 @@ export default function DashboardPage() {
                       <h4>Custom Username Color</h4>
                       <p>Select your signature aesthetic for the global Leaderboards.</p>
                     </div>
-                    <select className="input" defaultValue={user.profileColor}>
+                    <select
+                      className="input"
+                      value={user.profileColor}
+                      disabled={savingColor}
+                      onChange={(e) => saveProfileColor(e.target.value)}
+                      style={{ minWidth: 140 }}
+                    >
                       <option value="derby">Brown Derby</option>
                       <option value="sage">Sage Green</option>
                       <option value="terra">Terracotta</option>
@@ -364,16 +537,26 @@ export default function DashboardPage() {
                       <h4>Email Notifications</h4>
                       <p>Receive updates when your stories are trending.</p>
                     </div>
-                    <div className={`${styles.toggleSwitch} ${styles.active}`}>
+                    <div
+                      className={`${styles.toggleSwitch} ${emailNotifications ? styles.active : ""}`}
+                      onClick={toggleEmailNotifications}
+                      style={{ opacity: savingNotif ? 0.6 : 1, cursor: savingNotif ? "not-allowed" : "pointer" }}
+                      title={emailNotifications ? "Click to disable" : "Click to enable"}
+                    >
                       <div className={styles.toggleHandle}></div>
                     </div>
                   </div>
                   <div className={styles.settingsRow}>
                     <div className={styles.settingLabel}>
                       <h4 style={{ color: "var(--danger)" }}>Delete Account</h4>
-                      <p>Permanently remove your stats, stories, and data.</p>
+                      <p>Permanently remove your stats, stories, and data. This cannot be undone.</p>
                     </div>
-                    <button className="btn btn-danger btn-sm">Delete</button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => setShowDeleteAccount(true)}
+                    >
+                      Delete Account
+                    </button>
                   </div>
                 </div>
               </ScrollReveal>
@@ -382,6 +565,212 @@ export default function DashboardPage() {
 
         </div>
       </div>
+
+      {/* ── Delete Sprint Confirmation Dialog ──────────────────────────────── */}
+      {deleteTarget && (
+        <div className="modal-overlay" onClick={closeDeleteDialog}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
+            <div className="modal-header">
+              <h3>Delete Sprint?</h3>
+              <p className="text-muted" style={{ marginTop: "var(--space-xs)", fontSize: "0.9rem" }}>
+                <strong>"{deleteTarget.title || "Untitled Draft"}"</strong> will be permanently removed. This cannot be undone.
+              </p>
+            </div>
+            <div className="modal-actions">
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={closeDeleteDialog}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <span className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} />
+                    Deleting…
+                  </span>
+                ) : "Delete Sprint"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete Account Confirmation Dialog ─────────────────────────────── */}
+      {showDeleteAccount && (
+        <div className="modal-overlay" onClick={() => { if (!isDeletingAccount) setShowDeleteAccount(false); }}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
+            <div className="modal-header">
+              <h3 style={{ color: "var(--danger)" }}>Delete Your Account?</h3>
+              <p className="text-muted" style={{ marginTop: "var(--space-xs)", fontSize: "0.9rem" }}>
+                This will permanently delete <strong>@{user.username}</strong> along with all your sprints, stats, and data. There is absolutely no way to recover this.
+              </p>
+            </div>
+            <div style={{
+              background: "var(--danger-soft)",
+              border: "1px solid var(--danger)",
+              borderRadius: "var(--radius-md)",
+              padding: "var(--space-md)",
+              marginBottom: "var(--space-md)",
+              fontSize: "0.85rem",
+              color: "var(--danger)",
+              fontWeight: 600,
+            }}>
+              ⚠️ All your stories, achievements, aura, and streak data will be gone forever.
+            </div>
+            <div className="modal-actions">
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowDeleteAccount(false)}
+                disabled={isDeletingAccount}
+              >
+                Keep My Account
+              </button>
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={confirmDeleteAccount}
+                disabled={isDeletingAccount}
+              >
+                {isDeletingAccount ? (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <span className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} />
+                    Deleting…
+                  </span>
+                ) : "Yes, Delete Everything"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit Modal ─────────────────────────────────────────────────────── */}
+      {editTarget && (
+        <div className="modal-overlay" onClick={closeEditModal}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
+            <div className="modal-header">
+              <h3>Edit Sprint</h3>
+              <p className="text-muted" style={{ marginTop: "var(--space-xs)", fontSize: "0.85rem" }}>
+                sprinting.ink preserves the raw, unedited writing. You can update the title, category, and visibility only.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+
+              {/* Title */}
+              <div className="input-group">
+                <label className="input-label">Title</label>
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Untitled Sprint"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  maxLength={120}
+                />
+              </div>
+
+              {/* Category */}
+              <div className="input-group">
+                <label className="input-label">Category</label>
+                <select
+                  className="input"
+                  value={editCategory}
+                  onChange={(e) => setEditCategory(e.target.value)}
+                >
+                  {STORY_CATEGORIES.map((c) => (
+                    <option key={c.id} value={c.id}>{c.icon} {c.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Visibility */}
+              <div className="input-group">
+                <label className="input-label">Visibility</label>
+                <div style={{ display: "flex", gap: "var(--space-sm)" }}>
+                  <button
+                    type="button"
+                    onClick={() => setEditIsHidden(false)}
+                    style={{
+                      flex: 1,
+                      padding: "10px",
+                      border: `1.5px solid ${!editIsHidden ? "var(--success)" : "var(--border)"}`,
+                      borderRadius: "var(--radius-md)",
+                      background: !editIsHidden ? "var(--success-soft)" : "var(--bg-elevated)",
+                      color: !editIsHidden ? "var(--success)" : "var(--text-muted)",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontSize: "0.85rem",
+                      transition: "all 150ms ease",
+                    }}
+                  >
+                    🌍 Public
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditIsHidden(true)}
+                    style={{
+                      flex: 1,
+                      padding: "10px",
+                      border: `1.5px solid ${editIsHidden ? "var(--warning)" : "var(--border)"}`,
+                      borderRadius: "var(--radius-md)",
+                      background: editIsHidden ? "var(--warning-soft)" : "var(--bg-elevated)",
+                      color: editIsHidden ? "#8B6914" : "var(--text-muted)",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontSize: "0.85rem",
+                      transition: "all 150ms ease",
+                    }}
+                  >
+                    🔒 Draft
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={closeEditModal}
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={confirmEdit}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <span className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} />
+                    Saving…
+                  </span>
+                ) : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Toast ──────────────────────────────────────────────────────────── */}
+      {toast && (
+        <div
+          className="toast"
+          style={{
+            borderColor: toast.type === "error" ? "var(--danger)" : "var(--success)",
+            color: toast.type === "error" ? "var(--danger)" : "var(--success)",
+            fontWeight: 600,
+            fontSize: "0.9rem",
+          }}
+        >
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }

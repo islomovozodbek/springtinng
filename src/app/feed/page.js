@@ -1,28 +1,121 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import styles from "./feed.module.css";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 import ScrollReveal from "@/components/ScrollReveal";
 import StoryFocusView from "@/components/StoryFocusView";
 import PageShapes from "@/components/PageShapes";
 
 const CATEGORIES = ["All", "Cyberpunk", "Fantasy", "Mystery", "Sci-Fi", "Horror", "Tech", "Romance", "Surreal"];
 
-function StoryCard({ story, onClick }) {
-  const [score, setScore] = useState(story.net_score || 0);
-  const [userVote, setUserVote] = useState(0);
+// ── Login Prompt Modal ────────────────────────────────────────────────────────
+function LoginPrompt({ onClose }) {
+  const overlayRef = useRef(null);
 
-  const handleVote = (e, val) => {
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div
+      className={styles.loginPromptOverlay}
+      ref={overlayRef}
+      onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
+    >
+      <div className={styles.loginPromptCard}>
+        <button className={styles.loginPromptClose} onClick={onClose} aria-label="Close">✕</button>
+        <div className={styles.loginPromptIcon}>✍️</div>
+        <h2 className={styles.loginPromptTitle}>Join the conversation</h2>
+        <p className={styles.loginPromptSubtitle}>
+          Log in to upvote and downvote stories, support great writers, and make your voice count.
+        </p>
+        <div className={styles.loginPromptActions}>
+          <Link href="/login" className={styles.loginPromptBtn}>Log in</Link>
+          <Link href="/register" className={styles.loginPromptBtnSecondary}>Create account</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Story Card ────────────────────────────────────────────────────────────────
+function StoryCard({ story: initialStory, user, onClick, onNeedLogin }) {
+  const [story, setStory] = useState(initialStory);
+  const [voting, setVoting] = useState(false);
+
+  // Sync if parent re-loads stories
+  useEffect(() => { setStory(initialStory); }, [initialStory]);
+
+  const userVote = user
+    ? story.upvoters?.includes(user.uid)
+      ? 1
+      : story.downvoters?.includes(user.uid)
+      ? -1
+      : 0
+    : 0;
+
+  const handleVote = async (e, direction) => {
     e.stopPropagation();
-    if (userVote === val) {
-      setScore(score - val);
-      setUserVote(0);
-    } else {
-      setScore(score - userVote + val);
-      setUserVote(val);
+
+    if (!user) {
+      onNeedLogin();
+      return;
     }
-    // In a full implementation, we'd persist this vote to Supabase here
+
+    if (voting) return;
+    setVoting(true);
+
+    // Determine the RPC direction: toggle same = "none" (undo), else apply
+    const currentVote = story.upvoters?.includes(user.uid)
+      ? "up"
+      : story.downvoters?.includes(user.uid)
+      ? "down"
+      : "none";
+
+    const rpcDirection = currentVote === direction ? "none" : direction;
+
+    // Optimistic update
+    let optimisticUpvoters = [...(story.upvoters ?? [])];
+    let optimisticDownvoters = [...(story.downvoters ?? [])];
+    optimisticUpvoters = optimisticUpvoters.filter((id) => id !== user.uid);
+    optimisticDownvoters = optimisticDownvoters.filter((id) => id !== user.uid);
+    if (rpcDirection === "up") optimisticUpvoters.push(user.uid);
+    if (rpcDirection === "down") optimisticDownvoters.push(user.uid);
+    const optimisticScore = optimisticUpvoters.length - optimisticDownvoters.length;
+
+    setStory((prev) => ({
+      ...prev,
+      upvoters: optimisticUpvoters,
+      downvoters: optimisticDownvoters,
+      net_score: optimisticScore,
+    }));
+
+    // Persist via RPC (SECURITY DEFINER bypasses author-only RLS)
+    const { data, error } = await supabase.rpc("vote_story", {
+      p_story_id:  story.id,
+      p_user_id:   user.uid,
+      p_direction: rpcDirection,
+    });
+
+    if (error) {
+      console.error("Vote error:", error);
+      // Rollback on failure
+      setStory(initialStory);
+    } else if (data) {
+      setStory((prev) => ({
+        ...prev,
+        upvoters:   data.upvoters   ?? optimisticUpvoters,
+        downvoters: data.downvoters ?? optimisticDownvoters,
+        net_score:  data.net_score  ?? optimisticScore,
+      }));
+    }
+
+    setVoting(false);
   };
 
   const timeAgo = (dateStr) => {
@@ -53,16 +146,26 @@ function StoryCard({ story, onClick }) {
 
         <div className={styles.storyActions}>
           <div className={styles.voteGroup}>
-            <button 
-              className={`${styles.voteBtn} ${userVote === 1 ? styles.voteBtnActive : ""}`}
-              onClick={(e) => handleVote(e, 1)}
+            <button
+              id={`vote-up-${story.id}`}
+              className={`${styles.voteBtn} ${userVote === 1 ? styles.voteBtnActive : ""} ${voting ? styles.voteBtnLoading : ""}`}
+              onClick={(e) => handleVote(e, "up")}
+              aria-label="Upvote"
+              disabled={voting}
             >
               ▲
             </button>
-            <span className={styles.voteScore}>{score}</span>
-            <button 
-              className={`${styles.voteBtn} ${userVote === -1 ? styles.voteBtnActive : ""}`}
-              onClick={(e) => handleVote(e, -1)}
+            <span
+              className={`${styles.voteScore} ${userVote === 1 ? styles.voteScoreUp : userVote === -1 ? styles.voteScoreDown : ""}`}
+            >
+              {story.net_score > 0 ? `+${story.net_score}` : story.net_score}
+            </span>
+            <button
+              id={`vote-down-${story.id}`}
+              className={`${styles.voteBtn} ${styles.voteBtnDown} ${userVote === -1 ? styles.voteBtnActiveDown : ""} ${voting ? styles.voteBtnLoading : ""}`}
+              onClick={(e) => handleVote(e, "down")}
+              aria-label="Downvote"
+              disabled={voting}
             >
               ▼
             </button>
@@ -75,17 +178,37 @@ function StoryCard({ story, onClick }) {
   );
 }
 
+// ── Feed Page ─────────────────────────────────────────────────────────────────
 export default function FeedPage() {
+  const { user } = useAuth();
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [sortBy, setSortBy] = useState("Newest"); // "Newest" or "Trending"
+  const [sortBy, setSortBy] = useState("Newest");
   const [selectedStory, setSelectedStory] = useState(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const PAGE_SIZE = 20;
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setPage(0);
+    setHasMore(true);
+    // Note: stories will be cleared when the fetch for page 0 starts
+  }, [activeCategory, sortBy, search]);
 
   useEffect(() => {
     const fetchStories = async () => {
-      setLoading(true);
+      if (page === 0) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+
       try {
         let query = supabase
           .from("stories")
@@ -106,25 +229,37 @@ export default function FeedPage() {
           query = query.or(`content.ilike.%${search}%,author_username.ilike.%${search}%`);
         }
 
-        const { data, error } = await query.limit(50);
-        
+        const from = page * PAGE_SIZE;
+        const to = from + PAGE_SIZE - 1;
+
+        const { data, error } = await query.range(from, to);
         if (error) throw error;
-        setStories(data || []);
+
+        if (!data || data.length < PAGE_SIZE) {
+          setHasMore(false);
+        }
+
+        if (page === 0) {
+          setStories(data || []);
+        } else {
+          setStories((prev) => [...prev, ...(data || [])]);
+        }
       } catch (err) {
         console.error("Error fetching feed:", err);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     };
 
     fetchStories();
-  }, [activeCategory, sortBy, search]);
+  }, [activeCategory, sortBy, search, page]);
 
   return (
     <div className={styles.feedPage}>
       <PageShapes page="feed" />
       <div className="container">
-        
+
         <header className={styles.feedHeader}>
           <ScrollReveal animation="fadeUp">
             <h1>Discovery</h1>
@@ -138,9 +273,9 @@ export default function FeedPage() {
               <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
               </svg>
-              <input 
-                type="text" 
-                placeholder="Search stories, authors, or concepts..." 
+              <input
+                type="text"
+                placeholder="Search stories, authors, or concepts..."
                 className={styles.searchInput}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -151,8 +286,8 @@ export default function FeedPage() {
           <ScrollReveal animation="fadeUp" delay={200}>
             <div className={styles.categoryGrid}>
               {CATEGORIES.map(cat => (
-                <button 
-                  key={cat} 
+                <button
+                  key={cat}
                   className={`${styles.categoryPill} ${activeCategory === cat ? styles.categoryPillActive : ""}`}
                   onClick={() => setActiveCategory(cat)}
                 >
@@ -164,13 +299,13 @@ export default function FeedPage() {
 
           <ScrollReveal animation="fadeUp" delay={300}>
             <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "10px" }}>
-              <button 
+              <button
                 onClick={() => setSortBy("Newest")}
                 style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.9rem", color: sortBy === "Newest" ? "var(--text-primary)" : "var(--text-muted)", fontWeight: sortBy === "Newest" ? "700" : "400" }}
               >
                 Latest
               </button>
-              <button 
+              <button
                 onClick={() => setSortBy("Trending")}
                 style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.9rem", color: sortBy === "Trending" ? "var(--text-primary)" : "var(--text-muted)", fontWeight: sortBy === "Trending" ? "700" : "400" }}
               >
@@ -185,7 +320,13 @@ export default function FeedPage() {
             <div className="spinner" style={{ margin: "50px auto" }} />
           ) : stories.length > 0 ? (
             stories.map(story => (
-              <StoryCard key={story.id} story={story} onClick={setSelectedStory} />
+              <StoryCard
+                key={story.id}
+                story={story}
+                user={user}
+                onClick={setSelectedStory}
+                onNeedLogin={() => setShowLoginPrompt(true)}
+              />
             ))
           ) : (
             <div style={{ textAlign: "center", padding: "100px", color: "var(--text-muted)" }}>
@@ -194,11 +335,27 @@ export default function FeedPage() {
           )}
         </main>
 
+        {hasMore && stories.length > 0 && (
+          <div className={styles.loadMoreWrapper}>
+            <button
+              className={styles.loadMoreBtn}
+              onClick={() => setPage((p) => p + 1)}
+              disabled={loadingMore}
+            >
+              {loadingMore ? "Loading..." : "Load More"}
+            </button>
+          </div>
+        )}
+
         {selectedStory && (
-          <StoryFocusView 
-            story={selectedStory} 
-            onClose={() => setSelectedStory(null)} 
+          <StoryFocusView
+            story={selectedStory}
+            onClose={() => setSelectedStory(null)}
           />
+        )}
+
+        {showLoginPrompt && (
+          <LoginPrompt onClose={() => setShowLoginPrompt(false)} />
         )}
 
       </div>

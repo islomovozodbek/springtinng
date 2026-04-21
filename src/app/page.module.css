@@ -48,6 +48,13 @@
   animation: fadeInUp var(--duration-slow) var(--ease-out) 0.1s both;
 }
 
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 2.8rem;
+    padding: 0 var(--space-md);
+  }
+}
+
 .heroLine {
   display: block;
 }
@@ -68,6 +75,13 @@
   margin: 0 auto var(--space-xl);
   animation: fadeInUp var(--duration-slow) var(--ease-out) 0.2s both;
   font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .heroSubtitle {
+    font-size: 1.1rem;
+    padding: 0 var(--space-lg);
+  }
 }
 
 .heroCTA {

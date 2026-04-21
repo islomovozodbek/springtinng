@@ -32,6 +32,15 @@
   width: 100%;
   text-align: center;
   animation: fadeInUp var(--duration-slow) var(--ease-out);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 600px) {
+  .setupCard {
+    padding: var(--space-xl) var(--space-lg);
+    border-radius: var(--radius-lg);
+  }
 }
 
 .setupCard h1 {
@@ -179,6 +188,15 @@
   margin-bottom: 60px;
   opacity: 1;
   transition: opacity 1s ease;
+  gap: var(--space-md);
+}
+
+@media (max-width: 768px) {
+  .sprintHeader {
+    flex-direction: column;
+    margin-bottom: 32px;
+    gap: 12px;
+  }
 }
 
 .sprintHeader.hidden {
@@ -214,6 +232,14 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
+}
+
+@media (max-width: 768px) {
+  .promptDisplay {
+    padding: 0 var(--space-md);
+    font-size: 1rem;
+    order: 2;
+  }
 }
 
 .rerollBtn {
@@ -351,6 +377,15 @@
   gap: var(--space-md);
   margin-bottom: var(--space-2xl);
   margin-top: var(--space-xl);
+}
+
+@media (max-width: 600px) {
+  .completeStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .completeStat:last-child {
+    grid-column: span 2;
+  }
 }
 
 .completeStat {

@@ -4,20 +4,25 @@ import { useEffect, useState, useRef } from "react";
 import getCaretCoordinates from "textarea-caret";
 
 export default function NinjaCursor({ targetRef, isActive = false }) {
+  const [isTouch, setIsTouch] = useState(false);
   const rafRef = useRef(null);
   const wrapperRef = useRef(null);
   const cursorRef = useRef(null);
-  
+
   const lastPos = useRef(null);
   const styleCount = useRef(0);
   const isProcessing = useRef(false);
+
+  useEffect(() => {
+    setIsTouch(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
 
   useEffect(() => {
     const loop = () => {
       const el = targetRef?.current;
       const wrapper = wrapperRef?.current;
       const cursor = cursorRef?.current;
-      
+
       if (!isActive || !el || !wrapper || !cursor) {
         if (wrapper) wrapper.style.setProperty("--cursor-visibility", "hidden");
         rafRef.current = requestAnimationFrame(loop);
@@ -32,7 +37,7 @@ export default function NinjaCursor({ targetRef, isActive = false }) {
       isProcessing.current = true;
 
       const caret = getCaretCoordinates(el, el.selectionStart);
-      
+
       // Compute un-scrollable relative mapping
       const rect = {
         x: caret.left - el.scrollLeft,
@@ -57,12 +62,12 @@ export default function NinjaCursor({ targetRef, isActive = false }) {
       styleCount.current = (styleCount.current + 1) % 2;
       const dx = rect.x - lastPos.current.x;
       const dy = lastPos.current.y - rect.y;
-      
+
       const cursorDragAngle = Math.atan2(dx, dy) + Math.PI / 2;
       const cursorDragDistance = Math.sqrt(dx * dx + Math.pow(rect.y - lastPos.current.y, 2));
 
       const cursorDragHeight =
-        Math.abs(Math.sin(cursorDragAngle)) * 12 +
+        Math.abs(Math.sin(cursorDragAngle)) * 8 +
         Math.abs(Math.cos(cursorDragAngle)) * rect.height;
       const cursorDragWidth = cursorDragDistance;
 
@@ -77,7 +82,7 @@ export default function NinjaCursor({ targetRef, isActive = false }) {
       wrapper.style.setProperty("--cursor-visibility", "visible");
 
       cursor.className = `ninja-cursor-head ninja-cursor-anim${styleCount.current}`;
-      
+
       lastPos.current = rect;
       isProcessing.current = false;
 
@@ -86,7 +91,9 @@ export default function NinjaCursor({ targetRef, isActive = false }) {
 
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [targetRef, isActive]);
+  }, [targetRef, isActive, isTouch]);
+
+  if (isTouch) return null;
 
   return (
     <div ref={wrapperRef} className="ninja-cursor-wrapper">

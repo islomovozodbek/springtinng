@@ -17,6 +17,13 @@
   border-radius: var(--radius-xl);
 }
 
+@media (max-width: 480px) {
+  .profileHeader {
+    padding: var(--space-lg);
+    gap: var(--space-md);
+  }
+}
+
 .profileAvatar {
   width: 100px;
   height: 100px;
@@ -69,6 +76,15 @@
 .profileStats {
   display: flex;
   gap: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .profileStats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
 }
 
 .profileStat {
@@ -127,8 +143,15 @@
 
 .achievementGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: var(--space-md);
+}
+
+@media (max-width: 480px) {
+  .achievementGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
 }
 
 .achievementCard {

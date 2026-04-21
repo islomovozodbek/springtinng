@@ -203,6 +203,7 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 body {
@@ -212,6 +213,8 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Removed the SVG noise filter to keep the background perfectly clean and white */
@@ -278,6 +281,7 @@ a:hover {
   justify-content: center;
   gap: var(--space-sm);
   padding: 12px 24px;
+  min-height: 44px;
   font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 600;
@@ -585,8 +589,17 @@ textarea.input {
 }
 
 @keyframes pulse-dot-nav {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.35; transform: scale(0.6); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.35;
+    transform: scale(0.6);
+  }
 }
 
 /* ── Dividers ── */
@@ -901,7 +914,7 @@ textarea.input {
   }
 
   .container {
-    padding: 0 var(--space-md);
+    padding: 0 var(--space-lg);
   }
 
   .section {
@@ -920,7 +933,20 @@ textarea.input {
 
 @media (max-width: 480px) {
   h1 {
-    font-size: 1.75rem;
+    font-size: 1.85rem;
+  }
+  
+  .btn, button, .categoryPill, .navLink, .voteBtn {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn {
+    width: 100%;
+    min-height: 48px;
   }
 
   .section-header {
@@ -963,7 +989,7 @@ textarea.input {
   top: 0;
   left: 0;
   height: var(--cursor-height);
-  width: 12px;
+  width: 8px;
   display: inline-block;
   user-select: none;
   background-color: var(--text-primary);
@@ -986,7 +1012,7 @@ textarea.input {
   user-select: none;
   background: linear-gradient(to right, var(--text-primary), transparent);
   transform: rotate(var(--cursor-drag-angle));
-  transform-origin: 6px center;
+  transform-origin: 4px center;
   opacity: 0.5;
   pointer-events: none;
   will-change: transform, opacity, height, width, transform-origin, background-color;
@@ -1001,17 +1027,49 @@ textarea.input {
 }
 
 @keyframes ninja-a1 {
-  0% { transform: translate3d(var(--cursor-x1), var(--cursor-y1), 0); opacity: 0; }
-  4% { opacity: 1; }
-  80% { opacity: 0.95; }
-  90% { transform: translate3d(var(--cursor-x2), var(--cursor-y2), 0); opacity: 0.9; }
-  100% { opacity: 0; }
+  0% {
+    transform: translate3d(var(--cursor-x1), var(--cursor-y1), 0);
+    opacity: 0;
+  }
+
+  4% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 0.95;
+  }
+
+  90% {
+    transform: translate3d(var(--cursor-x2), var(--cursor-y2), 0);
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes ninja-a2 {
-  0% { transform: translate3d(var(--cursor-x1), var(--cursor-y1), 0); opacity: 0; }
-  4% { opacity: 1; }
-  80% { opacity: 0.95; }
-  90% { transform: translate3d(var(--cursor-x2), var(--cursor-y2), 0); opacity: 0.9; }
-  100% { opacity: 0; }
+  0% {
+    transform: translate3d(var(--cursor-x1), var(--cursor-y1), 0);
+    opacity: 0;
+  }
+
+  4% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 0.95;
+  }
+
+  90% {
+    transform: translate3d(var(--cursor-x2), var(--cursor-y2), 0);
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }

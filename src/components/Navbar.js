@@ -54,9 +54,9 @@ export default function Navbar() {
         <div className={styles.navInner}>
           {/* Logo */}
           <Link href={user && !user.needsOnboarding ? "/dashboard" : (user?.needsOnboarding ? "#" : "/")} className={styles.logo} onClick={closeMobile} style={{ cursor: user?.needsOnboarding ? "default" : "pointer" }}>
-            <span className={styles.logoIcon}>⌨️</span>
+            <span className={styles.logoIcon}>🖋️</span>
             <span className={styles.logoText}>
-              sprinting<span className={styles.logoHighlight}> ink</span>
+              sprinting<span className={styles.logoHighlight}>.ink</span>
             </span>
           </Link>
 
@@ -91,6 +91,9 @@ export default function Navbar() {
                 <li>
                   <Link href="/search" className={styles.navLink}>Search</Link>
                 </li>
+                <li>
+                  <Link href={`/profile/${user.username}`} className={styles.navLink}>My Profile</Link>
+                </li>
               </>
               ) : null
             ) : (
@@ -116,15 +119,19 @@ export default function Navbar() {
             {user ? (
               !user.needsOnboarding ? (
                 <>
+                  <Link href={`/profile/${user.username}`} className={styles.auraBadge}>
+                    <span className={styles.auraIcon}>⭐</span>
+                    {user.aura || 0}
+                  </Link>
                   <Link href="/settings" className="btn btn-ghost btn-sm">
-                  ⚙️
-                </Link>
-                <Link href={`/profile/${user.username}`} className={styles.navLink}>
-                  <div className="avatar avatar-sm" style={{ marginRight: 4 }}>
-                    {(user.username || "U")[0].toUpperCase()}
-                  </div>
-                </Link>
-              </>
+                    ⚙️
+                  </Link>
+                  <Link href={`/profile/${user.username}`} className={styles.navLink}>
+                    <div className="avatar avatar-sm" style={{ marginRight: 4 }}>
+                      {(user.username || "U")[0].toUpperCase()}
+                    </div>
+                  </Link>
+                </>
               ) : null
             ) : (
               <>
@@ -164,14 +171,13 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className={styles.menuBtn}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
           >
-            <div className={styles.menuIcon}>
+            <div className={`${styles.menuIcon} ${mobileOpen ? styles.menuIconOpen : ""}`}>
               <span></span>
               <span></span>
               <span></span>
@@ -198,9 +204,15 @@ export default function Navbar() {
             <Link href="/achievements" className={styles.navLink} onClick={closeMobile}>🎯 Achievements</Link>
             <Link href="/search" className={styles.navLink} onClick={closeMobile}>🔍 Search</Link>
             <Link href="/referral" className={styles.navLink} onClick={closeMobile}>📨 Referrals</Link>
-            <div className={styles.navActions}>
-              <Link href="/settings" className="btn btn-secondary" onClick={closeMobile}>Settings</Link>
-              <Link href={`/profile/${user.username}`} className="btn btn-primary" onClick={closeMobile}>Profile</Link>
+            <div className={styles.navActions} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", padding: "0 16px" }}>
+              <Link href={`/profile/${user.username}`} className={styles.auraBadge}>
+                <span className={styles.auraIcon}>⭐</span>
+                {user.aura || 0}
+              </Link>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <Link href="/settings" className="btn btn-secondary" onClick={closeMobile}>Settings</Link>
+                <Link href={`/profile/${user.username}`} className="btn btn-primary" onClick={closeMobile}>Profile</Link>
+              </div>
             </div>
           </>
         ) : (

@@ -12,6 +12,8 @@ import { getRandomPrompt, CATEGORIES } from "@/data/prompts";
 import { getDailyPrompt } from "@/data/dailyPrompts";
 import NinjaCursor from "@/components/NinjaCursor";
 import styles from "./sprint.module.css";
+import { computeEarnedAchievements, getNewlyUnlocked, getAchievementById } from "@/lib/achievements";
+import { useAchievementToasts } from "@/components/AchievementToast";
 
 const TIME_MODES = [
   { value: 0.5, label: "30 sec", proOnly: false },
@@ -30,6 +32,7 @@ const MIN_DELETE_MS = 25;
 
 function SprintPageInner() {
   const { user, loading, updateLocalUser } = useAuth();
+  const { showAchievementToasts } = useAchievementToasts();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -129,14 +132,8 @@ function SprintPageInner() {
     setIsPublishing(true);
     const wordCount = text.trim().split(/\s+/).length;
     const auraGained = Math.floor(wordCount / 5);
-
-    const newAchievements = [];
-    if (wordCount >= 200) newAchievements.push("yapper");
-    if (isHardcore && Math.floor(timerInitialRef.current / 60) >= 3 && wordCount > 0) newAchievements.push("aint-no-way");
-    if (typeof window !== "undefined" && window.innerWidth <= 768) newAchievements.push("touch-grass");
-    
-    const currentAchievements = user.earnedAchievements || [];
-    const combinedAchievements = Array.from(new Set([...currentAchievements, ...newAchievements]));
+    const timerMinutes = Math.floor(timerInitialRef.current / 60);
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
     try {
       if (isDailyMode && dailyDate) {
@@ -167,7 +164,7 @@ function SprintPageInner() {
         // 3. Update participant_count on daily_prompts
         await supabase.rpc("increment_participant_count", { prompt_date_val: dailyDate }).catch(() => {});
 
-        // 4. Update profile: streak, xp, words
+        // 4. Compute updated streak
         const todayUTC = dailyDate;
         const lastDailyDate = user.lastDailyDate ?? null;
         const yesterday = new Date(Date.UTC(
@@ -180,17 +177,27 @@ function SprintPageInner() {
         if (lastDailyDate === yesterday) {
           newStreak += 1;
         } else if (lastDailyDate !== todayUTC) {
-          // It's not yesterday and not today, so streak is broken
           newStreak = 1;
         }
-        
         const newAura = (user.aura || 0) + auraGained;
         const newLongestStreak = Math.max(newStreak, user.longestStreak || 0);
+        const updatedTotalStories = (user.totalStories || 0) + 1;
+
+        // 5. Compute achievements against the post-save stats
+        const postSaveUser = {
+          ...user,
+          totalStories: updatedTotalStories,
+          currentStreak: newStreak,
+          longestStreak: newLongestStreak,
+        };
+        const fullEarned = computeEarnedAchievements(postSaveUser, { wordCount, timerMinutes, isHardcore, isMobile });
+        const newlyUnlockedIds = getNewlyUnlocked(user.earnedAchievements || [], fullEarned);
+        const combinedAchievements = [...fullEarned];
 
         const profileUpdate = {
           total_words: (user.totalWords || 0) + wordCount,
           aura: newAura,
-          total_stories: (user.totalStories || 0) + 1,
+          total_stories: updatedTotalStories,
           level: Math.floor(newAura / 500) + 1,
           current_streak: newStreak,
           longest_streak: newLongestStreak,
@@ -203,24 +210,27 @@ function SprintPageInner() {
           .update(profileUpdate)
           .eq("id", user.uid);
 
-        // Update local state so UI reflects changes immediately after redirect
-        if (updateLocalUser) {
-          updateLocalUser({
-            totalWords: profileUpdate.total_words,
-            aura: profileUpdate.aura,
-            totalStories: profileUpdate.total_stories,
-            level: profileUpdate.level,
-            currentStreak: profileUpdate.current_streak,
-            longestStreak: profileUpdate.longest_streak,
-            lastDailyDate: todayUTC,
-            earnedAchievements: combinedAchievements,
-          });
+        // 6. Update local state
+        updateLocalUser?.({
+          totalWords: profileUpdate.total_words,
+          aura: profileUpdate.aura,
+          totalStories: profileUpdate.total_stories,
+          level: profileUpdate.level,
+          currentStreak: newStreak,
+          longestStreak: newLongestStreak,
+          lastDailyDate: todayUTC,
+          earnedAchievements: combinedAchievements,
+        });
+
+        // 7. Show toasts for newly unlocked achievements
+        if (newlyUnlockedIds.length > 0) {
+          const toastData = newlyUnlockedIds.map(getAchievementById).filter(Boolean);
+          showAchievementToasts(toastData);
         }
 
         router.push("/daily");
       } else {
         // ── Regular Sprint Flow ─────────────────────────────────────────────
-        // 1. Save Story
         const { error: storyError } = await supabase.from("stories").insert({
           author_id: user.uid,
           author_username: user.username,
@@ -230,7 +240,7 @@ function SprintPageInner() {
           starter_sentence: prompt?.text || "",
           word_count: wordCount,
           category: saveCategory,
-          time_mode: Math.floor(timerInitialRef.current / 60),
+          time_mode: timerMinutes,
           net_score: 0,
           upvoters: [],
           downvoters: [],
@@ -241,10 +251,18 @@ function SprintPageInner() {
         if (storyError) throw storyError;
 
         const newAura = (user.aura || 0) + auraGained;
+        const updatedTotalStories = (user.totalStories || 0) + 1;
+
+        // Compute achievements against the post-save stats
+        const postSaveUser = { ...user, totalStories: updatedTotalStories };
+        const fullEarned = computeEarnedAchievements(postSaveUser, { wordCount, timerMinutes, isHardcore, isMobile });
+        const newlyUnlockedIds = getNewlyUnlocked(user.earnedAchievements || [], fullEarned);
+        const combinedAchievements = [...fullEarned];
+
         const profileUpdate = {
           total_words: (user.totalWords || 0) + wordCount,
           aura: newAura,
-          total_stories: (user.totalStories || 0) + 1,
+          total_stories: updatedTotalStories,
           level: Math.floor(newAura / 500) + 1,
           earned_achievements: combinedAchievements,
         };
@@ -256,14 +274,18 @@ function SprintPageInner() {
 
         if (profileError) throw profileError;
 
-        if (updateLocalUser) {
-          updateLocalUser({
-            totalWords: profileUpdate.total_words,
-            aura: profileUpdate.aura,
-            totalStories: profileUpdate.total_stories,
-            level: profileUpdate.level,
-            earnedAchievements: combinedAchievements,
-          });
+        updateLocalUser?.({
+          totalWords: profileUpdate.total_words,
+          aura: profileUpdate.aura,
+          totalStories: profileUpdate.total_stories,
+          level: profileUpdate.level,
+          earnedAchievements: combinedAchievements,
+        });
+
+        // Show toasts for newly unlocked achievements
+        if (newlyUnlockedIds.length > 0) {
+          const toastData = newlyUnlockedIds.map(getAchievementById).filter(Boolean);
+          showAchievementToasts(toastData);
         }
 
         router.push("/dashboard");
@@ -281,7 +303,7 @@ function SprintPageInner() {
             starter_sentence: prompt?.text || "",
             word_count: text.trim().split(/\s+/).length,
             category: saveCategory,
-            time_mode: Math.floor(timerInitialRef.current / 60),
+            time_mode: timerMinutes,
             timestamp: Date.now()
           });
           localStorage.setItem('offline_sprints', JSON.stringify(offlineSprints));
@@ -857,11 +879,13 @@ function SprintPageInner() {
             {!isDailyMode && (
               <button className="btn btn-ghost text-muted" onClick={async () => {
                 try {
-                  const { supabase } = await import("@/lib/supabase");
                   const currentAchievements = user?.earnedAchievements || [];
                   if (!currentAchievements.includes("negative-aura")) {
                     const combined = [...currentAchievements, "negative-aura"];
                     await supabase.from("profiles").update({ earned_achievements: combined }).eq("id", user?.uid);
+                    updateLocalUser?.({ earnedAchievements: combined });
+                    const achDef = getAchievementById("negative-aura");
+                    if (achDef) showAchievementToasts([achDef]);
                   }
                 } catch(e) {}
                 setPhase("setup");

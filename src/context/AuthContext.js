@@ -69,6 +69,7 @@ export function AuthProvider({ children }) {
             earnedAchievements: data.earned_achievements || [],
             lastDailyDate: data.last_daily_date,
             createdAt: data.created_at,
+            emailNotifications: data.email_notifications ?? true,
           });
         } else if (error && error.code === "PGRST116") {
           // If no profile exists (e.g., first time Google Login), create one automatically
@@ -103,6 +104,7 @@ export function AuthProvider({ children }) {
             net_score: 0,
             earned_achievements: [],
             last_daily_date: null,
+            email_notifications: true,
           };
           
           console.log("🔥 No profile found. Creating new profile for:", newUsername);
@@ -152,6 +154,7 @@ export function AuthProvider({ children }) {
             netScore: 0,
             earnedAchievements: [],
             lastDailyDate: null,
+            emailNotifications: true,
           });
         }
       } catch (err) {
@@ -322,6 +325,7 @@ export function AuthProvider({ children }) {
       netScore: profileData?.net_score || 0,
       earnedAchievements: profileData?.earned_achievements || [],
       lastDailyDate: profileData?.last_daily_date || null,
+      emailNotifications: profileData?.email_notifications ?? true,
     });
 
     return supabaseUser;

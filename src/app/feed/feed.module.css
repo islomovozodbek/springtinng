@@ -20,6 +20,15 @@
   letter-spacing: -0.02em;
 }
 
+@media (max-width: 768px) {
+  .feedHeader h1 {
+    font-size: 2.2rem;
+  }
+  .feedHeader p {
+    font-size: 1rem;
+  }
+}
+
 .feedHeader p {
   font-size: 1.25rem;
   color: var(--text-secondary);
@@ -69,9 +78,25 @@
 
 .categoryGrid {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .categoryGrid {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 4px 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 0 calc(-1 * var(--space-lg));
+    padding: 4px var(--space-lg);
+  }
+  .categoryGrid::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .categoryPill {
@@ -112,6 +137,13 @@
   padding: 40px;
   transition: all 0.3s ease;
   cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .storyCard {
+    padding: 24px;
+    border-radius: 12px;
+  }
 }
 
 .storyCard:hover {
@@ -200,22 +232,62 @@
   font-size: 1.25rem;
   cursor: pointer;
   color: var(--text-muted);
-  transition: color 0.2s ease;
-  padding: 4px;
+  transition: color 0.2s ease, transform 0.15s ease;
+  padding: 4px 6px;
+  border-radius: 6px;
+  line-height: 1;
 }
 
-.voteBtn:hover {
+.voteBtn:hover:not(:disabled) {
   color: var(--text-primary);
+  transform: scale(1.15);
 }
 
+.voteBtn:disabled {
+  cursor: default;
+}
+
+/* Upvote active = accent/green */
 .voteBtnActive {
   color: var(--accent);
+  transform: scale(1.15);
+}
+
+/* Downvote styles */
+.voteBtnDown:hover:not(:disabled) {
+  color: #e05c6a;
+}
+
+.voteBtnActiveDown {
+  color: #e05c6a;
+  transform: scale(1.15);
+}
+
+/* Loading pulse */
+.voteBtnLoading {
+  opacity: 0.5;
+  animation: votePulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes votePulse {
+  from { opacity: 0.5; }
+  to   { opacity: 0.9; }
 }
 
 .voteScore {
-  font-weight: 600;
-  min-width: 20px;
+  font-weight: 700;
+  min-width: 28px;
   text-align: center;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.voteScoreUp {
+  color: var(--accent);
+}
+
+.voteScoreDown {
+  color: #e05c6a;
 }
 
 .readMore {
@@ -343,4 +415,156 @@
   margin-top: 100px;
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+/* ── Login Prompt Modal ── */
+.loginPromptOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeInOverlay 0.2s ease;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.loginPromptCard {
+  position: relative;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 48px 40px 40px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  animation: slideUpCard 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUpCard {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+.loginPromptClose {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
+  padding: 4px;
+}
+
+.loginPromptClose:hover {
+  color: var(--text-primary);
+}
+
+.loginPromptIcon {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+.loginPromptTitle {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.loginPromptSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.loginPromptActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loginPromptBtn {
+  display: block;
+  padding: 14px 24px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  text-align: center;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.loginPromptBtn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.loginPromptBtnSecondary {
+  display: block;
+  padding: 13px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  text-align: center;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.loginPromptBtnSecondary:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+/* ── Load More ── */
+.loadMoreWrapper {
+  margin-top: 60px;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 40px;
+}
+
+.loadMoreBtn {
+  padding: 14px 40px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  min-width: 180px;
+}
+
+.loadMoreBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.loadMoreBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }

@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/context/AuthContext";
+import { AchievementToastProvider } from "@/components/AchievementToast";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -57,8 +58,10 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AuthProvider>
-          <Navbar />
-          <main>{children}</main>
+          <AchievementToastProvider>
+            <Navbar />
+            <main>{children}</main>
+          </AchievementToastProvider>
         </AuthProvider>
       </body>
     </html>

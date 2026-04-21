@@ -2,46 +2,69 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import PageShapes from "@/components/PageShapes";
-
-const ALL_ACHIEVEMENTS = [
-  { id: "first-story", icon: "🎯", name: "Starter Writer", desc: "Write your first story", auraReward: 20 },
-  { id: "og", icon: "👑", name: "OG", desc: "Among the first 100 registered users", auraReward: 100 },
-  { id: "streak-3", icon: "🔥", name: "Hat Trick", desc: "3-day writing streak", auraReward: 15 },
-  { id: "streak-7", icon: "🔥", name: "Week Warrior", desc: "7-day writing streak", auraReward: 30 },
-  { id: "streak-14", icon: "🔥", name: "Fortnight Force", desc: "14-day writing streak", auraReward: 50 },
-  { id: "streak-30", icon: "🔥", name: "Month Master", desc: "30-day writing streak", auraReward: 100 },
-  { id: "stories-10", icon: "📝", name: "Getting Started", desc: "Write 10 stories", auraReward: 25 },
-  { id: "stories-50", icon: "✍️", name: "Prolific Writer", desc: "Write 50 stories", auraReward: 75 },
-  { id: "chain-starter", icon: "🔗", name: "Chain Starter", desc: "3+ people continued your story", auraReward: 40 },
-  { id: "upvotes-50", icon: "⬆️", name: "Rising Star", desc: "Receive 50 total upvotes", auraReward: 30 },
-  { id: "upvotes-100", icon: "⬆️", name: "Crowd Favorite", desc: "Receive 100 total upvotes", auraReward: 60 },
-  { id: "social", icon: "🤝", name: "Social Butterfly", desc: "Follow 20 people", auraReward: 20 },
-  { id: "recruiter", icon: "📨", name: "Recruiter", desc: "Refer 3 friends who sign up", auraReward: 50 },
-  { id: "weekly-champ", icon: "🏆", name: "Weekly Champion", desc: "Reach #1 on weekly leaderboard", auraReward: 100 },
-  { id: "speed-demon", icon: "⚡", name: "Speed Demon", desc: "Complete a 1-min sprint", auraReward: 15 },
-  { id: "marathon", icon: "📝", name: "Marathon Writer", desc: "Complete a 5-min sprint", auraReward: 15 },
-  { id: "night-owl", icon: "🦉", name: "Night Owl", desc: "Write a story between midnight and 4 AM", auraReward: 20 },
-  { id: "early-bird", icon: "🐦", name: "Early Bird", desc: "Write a story between 5 AM and 7 AM", auraReward: 20 },
-  
-  // Brainrot Achievements
-  { id: "yapper", icon: "🗣️", name: "Professional Yapper", desc: "Write 200 words in a single sprint", auraReward: 30 },
-  { id: "cooking", icon: "👨‍🍳", name: "Bro is Cooking", desc: "Get 10 upvotes on a single story", auraReward: 50 },
-  { id: "touch-grass", icon: "🌱", name: "Touch Grass", desc: "Play a sprint on mobile", auraReward: 20 },
-  { id: "aint-no-way", icon: "💀", name: "Ain't No Way", desc: "Survive a 3-minute Hardcore sprint", auraReward: 100 },
-  { id: "negative-aura", icon: "📉", name: "Negative Aura", desc: "Trash a sprint right after finishing it", auraReward: 10 },
-];
+import { supabase } from "@/lib/supabase";
+import {
+  ALL_ACHIEVEMENTS,
+  computeEarnedAchievements,
+  getNewlyUnlocked,
+} from "@/lib/achievements";
+import { useAchievementToasts } from "@/components/AchievementToast";
 
 export default function AchievementsPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, updateLocalUser } = useAuth();
+  const { showAchievementToasts } = useAchievementToasts();
   const router = useRouter();
+  const hasSynced = useRef(false);
 
+  // Redirect unauthenticated users
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  // On mount (once user is available), compute and persist any newly unlocked achievements
+  useEffect(() => {
+    if (!user || hasSynced.current) return;
+    hasSynced.current = true;
+
+    const syncAchievements = async () => {
+      try {
+        const fullEarned = computeEarnedAchievements(user);
+        const newlyUnlockedIds = getNewlyUnlocked(user.earnedAchievements || [], fullEarned);
+
+        if (newlyUnlockedIds.length === 0) return;
+
+        const combinedAchievements = [...fullEarned];
+
+        // Persist to Supabase
+        const { error } = await supabase
+          .from("profiles")
+          .update({ earned_achievements: combinedAchievements })
+          .eq("id", user.uid);
+
+        if (error) {
+          console.error("Failed to persist achievements:", error.message);
+          return;
+        }
+
+        // Sync local state
+        updateLocalUser?.({ earnedAchievements: combinedAchievements });
+
+        // Show toasts for each newly unlocked achievement
+        const toastData = newlyUnlockedIds
+          .map((id) => ALL_ACHIEVEMENTS.find((a) => a.id === id))
+          .filter(Boolean);
+        showAchievementToasts(toastData);
+      } catch (err) {
+        console.error("Achievement sync error:", err);
+      }
+    };
+
+    syncAchievements();
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading || !user) {
     return (
@@ -51,20 +74,8 @@ export default function AchievementsPage() {
     );
   }
 
-  // Mock: unlock a few achievements
-  const unlocked = new Set(user.earnedAchievements || []);
-  if (user.totalStories >= 1) unlocked.add("first-story");
-  if (user.isOG) unlocked.add("og");
-  if (user.currentStreak >= 3) unlocked.add("streak-3");
-  if (user.currentStreak >= 7) unlocked.add("streak-7");
-  if (user.currentStreak >= 14) unlocked.add("streak-14");
-  if (user.currentStreak >= 30) unlocked.add("streak-30");
-  if (user.totalStories >= 10) unlocked.add("stories-10");
-  if (user.totalStories >= 50) unlocked.add("stories-50");
-  if (user.totalUpvotesReceived >= 50) unlocked.add("upvotes-50");
-  if (user.totalUpvotesReceived >= 100) unlocked.add("upvotes-100");
-  if (user.followingCount >= 20) unlocked.add("social");
-
+  // Compute the full earned set purely for display (the sync already updated the DB)
+  const unlocked = computeEarnedAchievements(user);
   const progress = Math.round((unlocked.size / ALL_ACHIEVEMENTS.length) * 100);
 
   return (

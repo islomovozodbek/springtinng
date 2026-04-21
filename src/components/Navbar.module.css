@@ -85,6 +85,33 @@
   background-color: var(--accent-soft);
 }
 
+.auraBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: all var(--duration-fast) var(--ease-out);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.auraBadge:hover {
+  background: var(--bg-elevated);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.auraIcon {
+  font-size: 0.9rem;
+  filter: drop-shadow(0 0 2px rgba(244, 208, 63, 0.3));
+}
+
 .navActions {
   display: flex;
   align-items: center;
@@ -134,6 +161,10 @@
   color: var(--text-primary);
   border-radius: var(--radius-sm);
   transition: background-color var(--duration-fast) var(--ease-out);
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
 }
 
 .menuBtn:hover {
@@ -153,6 +184,19 @@
   background-color: currentColor;
   border-radius: 2px;
   transition: all var(--duration-fast) var(--ease-out);
+  transform-origin: center;
+}
+
+.menuIconOpen span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.menuIconOpen span:nth-child(2) {
+  opacity: 0;
+}
+
+.menuIconOpen span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 /* Mobile overlay */
@@ -203,6 +247,7 @@
 
   .menuBtn {
     display: flex;
+    margin-right: -10px;
   }
 
   .mobileOverlay.open {

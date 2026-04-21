@@ -13,6 +13,14 @@
   border-bottom: 1px solid var(--border);
 }
 
+@media (max-width: 768px) {
+  .profileHeader {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-md);
+  }
+}
+
 .profileAvatar {
   width: 96px;
   height: 96px;
@@ -43,6 +51,16 @@
   display: flex;
   gap: var(--space-lg);
   margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .profileStats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    justify-content: center;
+  }
 }
 
 .statItem {
@@ -68,6 +86,13 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: var(--space-2xl);
+}
+
+@media (max-width: 768px) {
+  .dashContent {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
 }
 
 .sidebar {
@@ -127,6 +152,24 @@
   justify-content: space-between;
   align-items: flex-start;
   transition: all 0.2s ease;
+  gap: var(--space-md);
+}
+
+@media (max-width: 600px) {
+  .storyRow {
+    flex-direction: column;
+  }
+  .storyActions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+  }
+  .actionBtn {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
 }
 
 .storyRow:hover {
