@@ -120,6 +120,29 @@ CREATE TABLE IF NOT EXISTS public.daily_prompts (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- General Prompts table
+CREATE TABLE IF NOT EXISTS public.prompts (
+  id INTEGER PRIMARY KEY,
+  text TEXT NOT NULL,
+  category TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE public.prompts ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'prompts' AND policyname = 'Allow public read access'
+  ) THEN
+    CREATE POLICY "Allow public read access" ON public.prompts FOR SELECT USING (true);
+  END IF;
+END $$;
+
+
 -- Daily Submissions table
 CREATE TABLE IF NOT EXISTS public.daily_submissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
