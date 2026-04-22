@@ -194,6 +194,9 @@ export default function FeedPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const PAGE_SIZE = 20;
 
+  useEffect(() => {
+    setPage(0);
+    setHasMore(true);
   }, [sortBy, search]);
 
   useEffect(() => {
