@@ -11,10 +11,10 @@ import { useRouter } from "next/navigation";
 import { CONFIG } from "@/lib/config";
 import PageShapes from "@/components/PageShapes";
 import { getTodayUTC } from "@/data/dailyPrompts";
-import { CATEGORIES } from "@/data/prompts";
+
 
 // ── Story categories (exclude "all" from the edit dropdown) ────────────────
-const STORY_CATEGORIES = CATEGORIES.filter((c) => c.id !== "all");
+
 
 export default function DashboardPage() {
   const { user, loading: authLoading, updateLocalUser, logout } = useAuth();
@@ -482,7 +482,7 @@ export default function DashboardPage() {
                             <span>•</span>
                             <span>{story.wordCount} words</span>
                             <span>•</span>
-                            <span>{story.category || "Uncategorized"}</span>
+
                             {story.isHidden && <span style={{ color: "var(--warning)" }}>• Draft</span>}
                           </div>
                           <p style={{ marginTop: "12px", color: "var(--text-secondary)", fontSize: "0.95rem" }}>
@@ -706,19 +706,7 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Category */}
-              <div className="input-group">
-                <label className="input-label">Category</label>
-                <select
-                  className="input"
-                  value={editCategory}
-                  onChange={(e) => setEditCategory(e.target.value)}
-                >
-                  {STORY_CATEGORIES.map((c) => (
-                    <option key={c.id} value={c.id}>{c.icon} {c.label}</option>
-                  ))}
-                </select>
-              </div>
+
 
               {/* Visibility */}
               <div className="input-group">

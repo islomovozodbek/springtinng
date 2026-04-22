@@ -9,7 +9,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import StoryFocusView from "@/components/StoryFocusView";
 import PageShapes from "@/components/PageShapes";
 
-const CATEGORIES = ["All", "Cyberpunk", "Fantasy", "Mystery", "Sci-Fi", "Horror", "Tech", "Romance", "Surreal"];
+
 
 // ── Login Prompt Modal ────────────────────────────────────────────────────────
 function LoginPrompt({ onClose }) {
@@ -135,7 +135,7 @@ function StoryCard({ story: initialStory, user, onClick, onNeedLogin }) {
           <span className={`${styles.storyAuthor} ${story.is_pro_user ? "username-pro username-color-derby" : ""}`}>
             @{story.author_username}
           </span>
-          <span className={styles.storyCategory}>{story.category}</span>
+
           <span className={styles.storyTime}>{timeAgo(story.created_at)}</span>
         </div>
 
@@ -184,7 +184,7 @@ export default function FeedPage() {
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+
   const [sortBy, setSortBy] = useState("Newest");
   const [selectedStory, setSelectedStory] = useState(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -194,12 +194,7 @@ export default function FeedPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const PAGE_SIZE = 20;
 
-  // Reset pagination when filters change
-  useEffect(() => {
-    setPage(0);
-    setHasMore(true);
-    // Note: stories will be cleared when the fetch for page 0 starts
-  }, [activeCategory, sortBy, search]);
+  }, [sortBy, search]);
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -215,9 +210,7 @@ export default function FeedPage() {
           .select("*")
           .eq("is_hidden", false);
 
-        if (activeCategory !== "All") {
-          query = query.eq("category", activeCategory.toLowerCase());
-        }
+
 
         if (sortBy === "Trending") {
           query = query.order("net_score", { ascending: false });
@@ -253,7 +246,7 @@ export default function FeedPage() {
     };
 
     fetchStories();
-  }, [activeCategory, sortBy, search, page]);
+  }, [sortBy, search, page]);
 
   return (
     <div className={styles.feedPage}>
@@ -283,19 +276,7 @@ export default function FeedPage() {
             </div>
           </ScrollReveal>
 
-          <ScrollReveal animation="fadeUp" delay={200}>
-            <div className={styles.categoryGrid}>
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  className={`${styles.categoryPill} ${activeCategory === cat ? styles.categoryPillActive : ""}`}
-                  onClick={() => setActiveCategory(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </ScrollReveal>
+
 
           <ScrollReveal animation="fadeUp" delay={300}>
             <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginTop: "10px" }}>

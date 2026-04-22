@@ -51,8 +51,7 @@ export default function StoryFocusView({ story, onClose }) {
             <span className={styles.focusAuthor}>@{story.authorUsername}</span>
             <span className={styles.focusDot}>•</span>
             <span className={styles.focusTime}>{story.wordCount} words</span>
-            <span className={styles.focusDot}>•</span>
-            <span className={styles.focusCategory}>{story.category}</span>
+
           </div>
           <button 
             className={`${styles.playbackBtn} ${isPlaying ? styles.isPlaying : ""}`}

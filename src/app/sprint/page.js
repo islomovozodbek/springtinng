@@ -929,17 +929,8 @@ function SprintPageInner() {
                 />
              </div>
              
-             <div className="input-group">
-                <label className="input-label">Category</label>
-                <select 
-                  className="input"
-                  value={saveCategory}
-                  onChange={(e) => setSaveCategory(e.target.value)}
-                >
-                  {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
-                </select>
-             </div>
-          </div>
+              </div>
+           </div>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "center" }}>
             <button 

@@ -138,9 +138,9 @@ export default function Home() {
               <p>
                 Perfectionism is the enemy of the first draft. In Sprinting Ink, as you type, your older sentences blur out like drying ink. You can&apos;t go back to edit them. You can only move forward.
               </p>
-              <Link href="/feed" className="btn btn-secondary mt-4">
+{/* <Link href="/feed" className="btn btn-secondary mt-4">
                 Read the survivors
-              </Link>
+              </Link> */}
             </ScrollReveal>
           </div>
           <div className={styles.splitVisual} style={{ position: "relative" }}>
