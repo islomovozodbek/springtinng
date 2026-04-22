@@ -63,6 +63,7 @@ function SprintPageInner() {
   const [inactivityMs, setInactivityMs] = useState(0);
   const [rerolls, setRerolls] = useState(isDailyMode ? 0 : 3);
   const [title, setTitle] = useState("");
+  const [showTitleError, setShowTitleError] = useState(false);
   const [saveCategory, setSaveCategory] = useState("general");
   const [isPublishing, setIsPublishing] = useState(false);
   const [theme, setTheme] = useState("light");
@@ -127,7 +128,12 @@ function SprintPageInner() {
   };
 
   const handlePublish = async () => {
-    if (!user || text.length === 0 || isPublishing || !title.trim()) return;
+    if (!user || text.length === 0 || isPublishing) return;
+    if (!title.trim()) {
+      setShowTitleError(true);
+      return;
+    }
+    setShowTitleError(false);
     
     setIsPublishing(true);
     const wordCount = text.trim().split(/\s+/).length;
@@ -843,13 +849,20 @@ function SprintPageInner() {
 
           <div style={{ margin: "32px 0", textAlign: "left", display: "flex", flexDirection: "column", gap: "16px" }}>
              <div className="input-group">
-                <label className="input-label">Story Title</label>
+                <label className="input-label">
+                  Story Title
+                  {showTitleError && <span style={{ color: "var(--danger)", marginLeft: "8px", fontSize: "0.85em", fontWeight: "normal" }}>* Required</span>}
+                </label>
                 <input 
                   type="text" 
                   className="input" 
+                  style={showTitleError ? { borderColor: "var(--danger)" } : {}}
                   placeholder="Give your sprint a name..." 
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                    if (showTitleError) setShowTitleError(false);
+                  }}
                 />
              </div>
              
