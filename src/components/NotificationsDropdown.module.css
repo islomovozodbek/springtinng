@@ -7,33 +7,33 @@
 .bellBtn {
   background: none;
   border: none;
-  font-size: 1.25rem;
   cursor: pointer;
-  padding: 6px;
   border-radius: 50%;
   transition: background 0.2s;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
+  height: 36px;
 }
 
 .bellBtn:hover {
   background: var(--bg-hover, rgba(0,0,0,0.05));
 }
 
-.badge {
-  position: absolute;
-  top: 2px;
-  right: 2px;
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.dotUnread {
   background: var(--danger);
-  color: white;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 2px 5px;
-  border-radius: 10px;
-  line-height: 1;
-  border: 2px solid var(--bg-surface);
+  animation: pulse-dot-nav 2s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--danger);
 }
 
 .dropdown {

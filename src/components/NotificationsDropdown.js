@@ -113,10 +113,7 @@ export default function NotificationsDropdown() {
         onClick={() => setOpen(!open)}
         aria-label="Notifications"
       >
-        🔔
-        {unreadCount > 0 && (
-          <span className={styles.badge}>{unreadCount > 9 ? "9+" : unreadCount}</span>
-        )}
+        <span className={`${styles.dot} ${unreadCount > 0 ? styles.dotUnread : ""}`} />
       </button>
 
       {open && (
