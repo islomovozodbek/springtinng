@@ -2,14 +2,16 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'dummy_key', {
+  apiVersion: '2023-10-16',
+});
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || 'dummy_secret';
 
 // We need the service role key to bypass RLS and update the user's tier
 // Do NOT use the regular anon key here!
 const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://dummy.supabase.co',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy_key'
 );
 
 export async function POST(req) {
