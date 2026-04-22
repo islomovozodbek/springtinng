@@ -86,9 +86,7 @@ export default function Navbar() {
                 <li>
                   <Link href="/leaderboard" className={styles.navLink}>Leaderboards</Link>
                 </li>
-                <li>
-                  <Link href="/shop" className={styles.navLink}>Shop</Link>
-                </li>
+
                 <li>
                   <Link href="/search" className={styles.navLink}>Search</Link>
                 </li>
@@ -206,7 +204,7 @@ export default function Navbar() {
             <Link href="/daily" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Calendar size={16} /> Daily Prompt</div></Link>
             <Link href="/feed" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><BookOpen size={16} /> Feed</div></Link>
             <Link href="/leaderboard" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Trophy size={16} /> Leaderboards</div></Link>
-            <Link href="/shop" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><ShoppingBag size={16} /> Shop</div></Link>
+
             <Link href="/achievements" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Target size={16} /> Achievements</div></Link>
             <Link href="/search" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Search size={16} /> Search</div></Link>
             <Link href="/referral" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Mail size={16} /> Referrals</div></Link>

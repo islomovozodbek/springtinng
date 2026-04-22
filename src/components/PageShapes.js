@@ -343,7 +343,7 @@ const PAGE_DESIGNS = {
   sprint:      { dominant: "bigArc",       subtle: "dotPair" },
   search:      { dominant: "tripleStroke", subtle: "dotPair" },
   settings:    { dominant: "enso",         subtle: "dotPair" },
-  shop:        { dominant: "bigArc",       subtle: "dotPair" },
+
   friends:     { dominant: "horizon",      subtle: "dotPair" },
   referral:    { dominant: "enso",         subtle: "dotPair" },
   "404":       { dominant: "horizon",      subtle: "dotPair" },
