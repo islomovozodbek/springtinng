@@ -100,4 +100,7 @@ INSERT INTO public.daily_prompts (prompt_date, prompt_id, prompt_text, prompt_ca
 ('2026-07-28', 'd52', 'The door is open. Write why nobody is going through it.', 'mystery'),
 ('2026-07-29', 'd53', 'You have to say something true about yourself to a stranger. Write what you choose and why.', 'slice'),
 ('2026-07-30', 'd75', 'Make a reader feel time stop.', 'meta')
-ON CONFLICT (prompt_date) DO UPDATE SET prompt_id = EXCLUDED.prompt_id, prompt_text = EXCLUDED.prompt_text, prompt_category = EXCLUDED.prompt_category;
+ON CONFLICT (prompt_date) DO UPDATE SET
+  prompt_id = EXCLUDED.prompt_id,
+  prompt_text = EXCLUDED.prompt_text,
+  prompt_category = EXCLUDED.prompt_category;
