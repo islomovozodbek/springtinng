@@ -157,7 +157,6 @@ export default function PricingPage() {
                 <li><span className={styles.checkIcon}>✓</span> <strong>Everything in Free, plus:</strong></li>
                 <li><span className={styles.checkIcon}>✓</span> Unlimited daily sprints</li>
                 <li><span className={styles.checkIcon}>✓</span> 1, 2, 5 & 10 min modes</li>
-                <li><span className={styles.checkIcon}>✓</span> Pro Prompt Categories</li>
                 <li><span className={styles.checkIcon}>✓</span> Custom Editor Themes</li>
                 <li><span className={styles.checkIcon}>✓</span> Advanced PDF Exports</li>
                 <li><span className={styles.checkIcon}>✓</span> Private Sprint Mode</li>

@@ -40,7 +40,7 @@ export default function DashboardPage() {
   // ── Edit modal state ───────────────────────────────────────────────────
   const [editTarget, setEditTarget] = useState(null); // story object
   const [editTitle, setEditTitle] = useState("");
-  const [editCategory, setEditCategory] = useState("general");
+
   const [editIsHidden, setEditIsHidden] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -203,7 +203,7 @@ export default function DashboardPage() {
   const openEditModal = (story) => {
     setEditTarget(story);
     setEditTitle(story.title || "");
-    setEditCategory(story.category || "general");
+
     setEditIsHidden(story.isHidden || false);
   };
   const closeEditModal = () => { if (!isSaving) setEditTarget(null); };
@@ -216,7 +216,7 @@ export default function DashboardPage() {
         .from("stories")
         .update({
           title: editTitle.trim() || "Untitled Sprint",
-          category: editCategory,
+
           is_hidden: editIsHidden,
         })
         .eq("id", editTarget.id);
@@ -226,7 +226,7 @@ export default function DashboardPage() {
       setMyStories((prev) =>
         prev.map((s) =>
           s.id === editTarget.id
-            ? { ...s, title: editTitle.trim() || "Untitled Sprint", category: editCategory, isHidden: editIsHidden }
+            ? { ...s, title: editTitle.trim() || "Untitled Sprint", isHidden: editIsHidden }
             : s
         )
       );

@@ -223,7 +223,6 @@ export default function Home() {
                     <li><span className={pricingStyles.checkIcon}>✓</span> Everything in Free, plus:</li>
                     <li><span className={pricingStyles.checkIcon}>✓</span> Unlimited daily sprints</li>
                     <li><span className={pricingStyles.checkIcon}>✓</span> 1, 2, 5 & 10 min modes</li>
-                    <li><span className={pricingStyles.checkIcon}>✓</span> Pro Prompt Categories</li>
                     <li><span className={pricingStyles.checkIcon}>✓</span> Custom Editor Themes</li>
                     <li><span className={pricingStyles.checkIcon}>✓</span> Advanced PDF Exports</li>
                     <li><span className={pricingStyles.checkIcon}>✓</span> Private Sprint Mode</li>

@@ -91,7 +91,7 @@ function SprintPageInner() {
   const [phase, setPhase] = useState("setup");
   const [timeMode, setTimeMode] = useState(0.5);
   const [userTime, setUserTime] = useState(""); // Custom minutes for Pro
-  const [category, setCategory] = useState("all");
+
   const [prompt, setPrompt] = useState(isDailyMode && dailyPromptData ? dailyPromptData : null);
   const [isCustomPrompt, setIsCustomPrompt] = useState(false);
   const [userPrompt, setUserPrompt] = useState("");
@@ -104,7 +104,7 @@ function SprintPageInner() {
   const [rerolls, setRerolls] = useState(isDailyMode ? 0 : 3);
   const [title, setTitle] = useState("");
   const [showTitleError, setShowTitleError] = useState(false);
-  const [saveCategory, setSaveCategory] = useState("general");
+
   const [isPublishing, setIsPublishing] = useState(false);
   const [theme, setTheme] = useState("light");
 
@@ -121,7 +121,7 @@ function SprintPageInner() {
   
   const handleReroll = () => {
     if (user?.tier !== "pro" && rerolls <= 0) return;
-    setPrompt(getRandomPrompt(user?.tier === "pro" ? category : "all"));
+    setPrompt(getRandomPrompt());
     if (user?.tier !== "pro") {
       setRerolls((r) => r - 1);
     }
@@ -276,7 +276,7 @@ function SprintPageInner() {
           content: text.trim(),
           starter_sentence: prompt?.text || "",
           word_count: wordCount,
-          category: saveCategory,
+
           time_mode: timerMinutes,
           net_score: 0,
           upvoters: [],
@@ -345,7 +345,7 @@ function SprintPageInner() {
             content: text.trim(),
             starter_sentence: prompt?.text || "",
             word_count: text.trim().split(/\s+/).length,
-            category: saveCategory,
+
             time_mode: timerMinutes,
             timestamp: Date.now()
           });
@@ -530,7 +530,7 @@ function SprintPageInner() {
     } else if (user?.tier === "pro" && isCustomPrompt && userPrompt.trim()) {
       selectedPrompt = { id: "custom", text: userPrompt.trim(), category: "custom" };
     } else {
-      selectedPrompt = getRandomPrompt(user?.tier === "pro" ? category : "all");
+      selectedPrompt = getRandomPrompt();
     }
 
     // Daily mode: always 3 min
