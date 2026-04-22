@@ -220,6 +220,18 @@ BEGIN
 END;
 $$;
 
+-- Sync username changes across the database
+CREATE OR REPLACE FUNCTION public.sync_username_changes()
+RETURNS trigger AS $$
+BEGIN
+  IF OLD.username <> NEW.username THEN
+    UPDATE public.stories SET author_username = NEW.username WHERE author_id = NEW.id;
+    UPDATE public.daily_submissions SET author_username = NEW.username WHERE author_id = NEW.id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Feed story voting system
 CREATE OR REPLACE FUNCTION public.vote_story(
   p_story_id    UUID,
@@ -304,6 +316,12 @@ DROP TRIGGER IF EXISTS on_follow_deleted ON public.follows;
 CREATE TRIGGER on_follow_deleted
   AFTER DELETE ON public.follows
   FOR EACH ROW EXECUTE FUNCTION public.handle_unfollow();
+
+-- Sync username changes
+DROP TRIGGER IF EXISTS on_username_updated ON public.profiles;
+CREATE TRIGGER on_username_updated
+  AFTER UPDATE OF username ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.sync_username_changes();
 
 -- 6. RLS POLICIES
 
