@@ -137,7 +137,7 @@ function SprintPageInner() {
     
     setIsPublishing(true);
     const wordCount = text.trim().split(/\s+/).length;
-    const auraGained = Math.floor(wordCount / 5);
+    const auraGained = Math.floor((wordCount * 2) / 5);
     const timerMinutes = Math.floor(timerInitialRef.current / 60);
     const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
@@ -842,7 +842,7 @@ function SprintPageInner() {
               <span>Time</span>
             </div>
             <div className={styles.completeStat}>
-              <strong style={{ color: "var(--success)" }}>+{Math.floor(wordCount / 5)}</strong>
+              <strong style={{ color: "var(--success)" }}>+{Math.floor((wordCount * 2) / 5)}</strong>
               <span>Aura</span>
             </div>
           </div>
