@@ -28,10 +28,6 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   following_count INTEGER DEFAULT 0,
   referral_code TEXT,
   referral_count INTEGER DEFAULT 0,
-  unlocked_themes TEXT[] DEFAULT ARRAY['default'],
-  unlocked_accessories TEXT[] DEFAULT ARRAY[]::TEXT[],
-  active_theme TEXT DEFAULT 'default',
-  active_accessories TEXT[] DEFAULT ARRAY[]::TEXT[],
   profile_color TEXT DEFAULT 'derby',
   net_score INTEGER DEFAULT 0,
   daily_streak INTEGER DEFAULT 0,
@@ -61,6 +57,20 @@ BEGIN
     -- Drop email_notifications if it exists
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'email_notifications') THEN
         ALTER TABLE public.profiles DROP COLUMN email_notifications;
+    END IF;
+
+    -- Drop shop-related columns if they exist
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'unlocked_themes') THEN
+        ALTER TABLE public.profiles DROP COLUMN unlocked_themes;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'unlocked_accessories') THEN
+        ALTER TABLE public.profiles DROP COLUMN unlocked_accessories;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'active_theme') THEN
+        ALTER TABLE public.profiles DROP COLUMN active_theme;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'active_accessories') THEN
+        ALTER TABLE public.profiles DROP COLUMN active_accessories;
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'earned_achievements') THEN

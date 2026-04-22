@@ -8,41 +8,44 @@
   background: none;
   border: none;
   cursor: pointer;
-  border-radius: 50%;
-  transition: background 0.2s;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
+  color: var(--text-secondary);
 }
 
 .bellBtn:hover {
-  background: var(--bg-hover, rgba(0,0,0,0.05));
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .bellIcon {
-  color: var(--text-primary);
-  transition: color 0.2s ease;
-}
-
-.bellBtn:hover .bellIcon {
-  color: var(--accent);
+  color: currentColor;
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .badge {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: -2px;
+  right: -2px;
   background: var(--danger);
   color: white;
-  font-size: 0.65rem;
+  font-size: 10px;
   font-weight: 700;
-  padding: 2px 5px;
-  border-radius: 10px;
+  padding: 0 4px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
-  border: 2px solid var(--bg-surface);
+  border: 2px solid var(--bg-primary);
 }
 
 .dropdown {

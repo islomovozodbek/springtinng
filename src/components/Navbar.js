@@ -90,9 +90,6 @@ export default function Navbar() {
                 <li>
                   <Link href="/search" className={styles.navLink}>Search</Link>
                 </li>
-                <li>
-                  <Link href={`/profile/${user.username}`} className={styles.navLink}>My Profile</Link>
-                </li>
               </>
               ) : null
             ) : (
@@ -120,14 +117,14 @@ export default function Navbar() {
                 <>
                   <Link href={`/profile/${user.username}`} className={styles.auraBadge}>
                     <span className={styles.auraIcon}><Star size={14} fill="currentColor" /></span>
-                    {user.aura || 0}
+                    <span style={{ marginTop: "1px" }}>{user.aura || 0}</span>
                   </Link>
                   <NotificationsDropdown />
-                  <Link href="/settings" className="btn btn-ghost btn-sm" style={{ padding: "8px" }}>
+                  <Link href="/settings" className="btn btn-ghost btn-sm" style={{ padding: "8px", color: "var(--text-secondary)" }}>
                     <Settings size={20} />
                   </Link>
-                  <Link href={`/profile/${user.username}`} className={styles.navLink}>
-                    <div className="avatar avatar-sm" style={{ marginRight: 4 }}>
+                  <Link href={`/profile/${user.username}`} style={{ display: "flex", alignItems: "center" }}>
+                    <div className="avatar avatar-sm" style={{ border: "1.5px solid var(--border)", transition: "all 0.2s ease" }}>
                       {user.photoURL ? (
                         <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
                       ) : (
