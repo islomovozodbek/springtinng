@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./Navbar.module.css";
+import NotificationsDropdown from "./NotificationsDropdown";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -123,12 +124,17 @@ export default function Navbar() {
                     <span className={styles.auraIcon}>⭐</span>
                     {user.aura || 0}
                   </Link>
+                  <NotificationsDropdown />
                   <Link href="/settings" className="btn btn-ghost btn-sm">
                     ⚙️
                   </Link>
                   <Link href={`/profile/${user.username}`} className={styles.navLink}>
                     <div className="avatar avatar-sm" style={{ marginRight: 4 }}>
-                      {(user.username || "U")[0].toUpperCase()}
+                      {user.photoURL ? (
+                        <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                      ) : (
+                        (user.username || "U")[0].toUpperCase()
+                      )}
                     </div>
                   </Link>
                 </>
@@ -209,7 +215,8 @@ export default function Navbar() {
                 <span className={styles.auraIcon}>⭐</span>
                 {user.aura || 0}
               </Link>
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <NotificationsDropdown />
                 <Link href="/settings" className="btn btn-secondary" onClick={closeMobile}>Settings</Link>
                 <Link href={`/profile/${user.username}`} className="btn btn-primary" onClick={closeMobile}>Profile</Link>
               </div>

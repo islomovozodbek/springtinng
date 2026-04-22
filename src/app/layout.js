@@ -1,4 +1,4 @@
-import { Lora, Inter, Source_Serif_4 } from "next/font/google";
+import { Lora, Inter, Source_Serif_4, Outfit, Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -23,6 +23,25 @@ const sourceSerif = Source_Serif_4({
   display: "swap",
 });
 
+const outfit = Outfit({
+  variable: "--font-body-var",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-heading-var",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-hero-var",
+  subsets: ["latin"],
+  weight: ["600"],
+  display: "swap",
+});
+
 export const metadata = {
   title: "Sprinting Ink — 3-Minute Creative Writing Sprints",
   description:
@@ -37,7 +56,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} ${lora.variable} ${sourceSerif.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${lora.variable} ${sourceSerif.variable} ${outfit.variable} ${playfair.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <head>
         <Script
           id="theme-init"

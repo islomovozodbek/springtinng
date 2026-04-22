@@ -27,9 +27,7 @@ export default function DashboardPage() {
   const [offlineSprints, setOfflineSprints] = useState([]);
 
   // ── Settings state ────────────────────────────────────────────────────
-  const [emailNotifications, setEmailNotifications] = useState(true);
   const [savingColor, setSavingColor] = useState(false);
-  const [savingNotif, setSavingNotif] = useState(false);
 
   // ── Delete Account dialog state ────────────────────────────────────────
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
@@ -65,7 +63,7 @@ export default function DashboardPage() {
     }
     if (user) {
       setProEnabled(user.tier === "pro");
-      setEmailNotifications(user.emailNotifications ?? true);
+      setProEnabled(user.tier === "pro");
       fetchStories();
       checkOfflineSprints();
     }
@@ -264,25 +262,45 @@ export default function DashboardPage() {
     }
   };
 
-  const toggleEmailNotifications = async () => {
-    if (savingNotif) return;
-    const next = !emailNotifications;
-    setSavingNotif(true);
-    setEmailNotifications(next); // optimistic
+
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      setToast({ message: "Image must be under 2MB.", type: "error" });
+      return;
+    }
+
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ email_notifications: next })
-        .eq("id", user.uid);
-      if (error) throw error;
-      updateLocalUser({ emailNotifications: next });
-      setToast({ message: next ? "Notifications enabled." : "Notifications disabled.", type: "success" });
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.uid}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl + "?t=" + new Date().getTime();
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ photo_url: publicUrl })
+        .eq('id', user.uid);
+
+      if (updateError) throw updateError;
+
+      updateLocalUser({ photoURL: publicUrl });
+      setToast({ message: "Avatar updated successfully.", type: "success" });
     } catch (err) {
-      console.error("toggleEmailNotifications failed:", err);
-      setEmailNotifications(!next); // rollback
-      setToast({ message: err?.message || "Failed to save preference.", type: "error" });
-    } finally {
-      setSavingNotif(false);
+      console.error("Avatar upload failed:", err);
+      setToast({ message: "Failed to upload avatar.", type: "error" });
     }
   };
 
@@ -316,7 +334,11 @@ export default function DashboardPage() {
         <ScrollReveal animation="fadeUp">
           <div className={styles.profileHeader}>
             <div className={styles.profileAvatar}>
-              {(user.username || user.email || "U")[0].toUpperCase()}
+              {user.photoURL ? (
+                <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+              ) : (
+                (user.username || user.email || "U")[0].toUpperCase()
+              )}
             </div>
 
             <div className={styles.profileInfo}>
@@ -531,21 +553,31 @@ export default function DashboardPage() {
                 </div>
 
                 <div className={styles.settingsSection}>
-                  <h3>Account</h3>
+                  <h3>Profile</h3>
                   <div className={styles.settingsRow}>
                     <div className={styles.settingLabel}>
-                      <h4>Email Notifications</h4>
-                      <p>Receive updates when your stories are trending.</p>
+                      <h4>Profile Picture</h4>
+                      <p>Upload a custom avatar (max 2MB).</p>
                     </div>
-                    <div
-                      className={`${styles.toggleSwitch} ${emailNotifications ? styles.active : ""}`}
-                      onClick={toggleEmailNotifications}
-                      style={{ opacity: savingNotif ? 0.6 : 1, cursor: savingNotif ? "not-allowed" : "pointer" }}
-                      title={emailNotifications ? "Click to disable" : "Click to enable"}
-                    >
-                      <div className={styles.toggleHandle}></div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                      <div className="avatar avatar-lg" style={{ flexShrink: 0, width: 48, height: 48 }}>
+                        {user.photoURL ? (
+                          <img src={user.photoURL} alt="Avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                        ) : (
+                          (user.username || "U")[0].toUpperCase()
+                        )}
+                      </div>
+                      <label className="btn btn-secondary btn-sm" style={{ cursor: "pointer" }}>
+                        Upload New
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleAvatarUpload} />
+                      </label>
                     </div>
                   </div>
+                </div>
+
+                <div className={styles.settingsSection}>
+                  <h3>Account</h3>
+
                   <div className={styles.settingsRow}>
                     <div className={styles.settingLabel}>
                       <h4 style={{ color: "var(--danger)" }}>Delete Account</h4>

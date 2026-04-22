@@ -34,12 +34,12 @@ export default function SearchPage() {
       const [byUsername, byDisplayName] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, username, display_name, tier, total_stories, level, profile_color, is_og")
+          .select("id, username, display_name, photo_url, tier, total_stories, level, profile_color, is_og")
           .ilike("username", term)
           .limit(15),
         supabase
           .from("profiles")
-          .select("id, username, display_name, tier, total_stories, level, profile_color, is_og")
+          .select("id, username, display_name, photo_url, tier, total_stories, level, profile_color, is_og")
           .ilike("display_name", term)
           .limit(15),
       ]);
@@ -131,7 +131,11 @@ export default function SearchPage() {
                   }}
                 >
                   <div className="avatar">
-                    {(user.username || "U")[0].toUpperCase()}
+                    {user.photo_url ? (
+                      <img src={user.photo_url} alt="Avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                    ) : (
+                      (user.username || "U")[0].toUpperCase()
+                    )}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>

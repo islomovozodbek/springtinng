@@ -35,8 +35,6 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   profile_color TEXT DEFAULT 'derby',
   net_score INTEGER DEFAULT 0,
   daily_streak INTEGER DEFAULT 0,
-  last_daily_date DATE,
-  email_notifications BOOLEAN DEFAULT true,
   earned_achievements TEXT[] DEFAULT ARRAY[]::TEXT[],
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -59,9 +57,12 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'last_daily_date') THEN
         ALTER TABLE public.profiles ADD COLUMN last_daily_date DATE;
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'email_notifications') THEN
-        ALTER TABLE public.profiles ADD COLUMN email_notifications BOOLEAN DEFAULT true;
+    
+    -- Drop email_notifications if it exists
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'email_notifications') THEN
+        ALTER TABLE public.profiles DROP COLUMN email_notifications;
     END IF;
+
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'earned_achievements') THEN
         ALTER TABLE public.profiles ADD COLUMN earned_achievements TEXT[] DEFAULT ARRAY[]::TEXT[];
     END IF;
@@ -127,12 +128,24 @@ CREATE TABLE IF NOT EXISTS public.daily_submissions (
   UNIQUE(daily_prompt_id, author_id)
 );
 
+-- Notifications table
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  actor_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  type TEXT NOT NULL, -- 'follow', 'upvote'
+  reference_id UUID, -- story id, etc.
+  is_read BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- 3. ROW LEVEL SECURITY
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.stories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.follows ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.daily_prompts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.daily_submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
 -- 4. FUNCTIONS & RPCs
 
@@ -151,12 +164,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Follow system counters
+-- Follow system counters and notifications
 CREATE OR REPLACE FUNCTION public.handle_new_follow()
 RETURNS trigger AS $$
 BEGIN
   UPDATE public.profiles SET following_count = following_count + 1 WHERE id = NEW.follower_id;
   UPDATE public.profiles SET followers_count = followers_count + 1 WHERE id = NEW.following_id;
+  
+  -- Create a notification for the followed user
+  INSERT INTO public.notifications (user_id, actor_id, type)
+  VALUES (NEW.following_id, NEW.follower_id, 'follow');
+  
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -244,6 +262,14 @@ BEGIN
     SET total_upvotes_received = GREATEST(0, total_upvotes_received + v_score_delta),
         net_score = GREATEST(0, net_score + v_score_delta)
     WHERE id = v_story.author_id;
+    
+    -- If it's a new upvote (not just removing a downvote to go to 0), notify the author
+    IF p_direction = 'up' AND p_user_id <> v_story.author_id THEN
+      -- Only notify if they haven't been notified for this specific user/story combo recently, or simply insert
+      -- To keep it simple, we just insert. The UI can group them.
+      INSERT INTO public.notifications (user_id, actor_id, type, reference_id)
+      VALUES (v_story.author_id, p_user_id, 'upvote', p_story_id);
+    END IF;
   END IF;
 
   RETURN json_build_object('upvoters', v_new_upvoters, 'downvoters', v_new_downvoters, 'net_score', v_new_net_score);
@@ -313,9 +339,34 @@ CREATE POLICY "Users can update their own daily submissions" ON public.daily_sub
 DROP POLICY IF EXISTS "Users can update votes on daily submissions" ON public.daily_submissions;
 CREATE POLICY "Users can update votes on daily submissions" ON public.daily_submissions FOR UPDATE USING (true);
 
+-- Notifications policies
+DROP POLICY IF EXISTS "Users can view their own notifications" ON public.notifications;
+CREATE POLICY "Users can view their own notifications" ON public.notifications FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update their own notifications" ON public.notifications;
+CREATE POLICY "Users can update their own notifications" ON public.notifications FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "System can insert notifications" ON public.notifications;
+CREATE POLICY "System can insert notifications" ON public.notifications FOR INSERT WITH CHECK (true); -- Functions use SECURITY DEFINER anyway
+DROP POLICY IF EXISTS "Users can delete their own notifications" ON public.notifications;
+CREATE POLICY "Users can delete their own notifications" ON public.notifications FOR DELETE USING (auth.uid() = user_id);
+
 -- 7. GRANTS
 REVOKE ALL ON FUNCTION public.delete_own_account() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.delete_own_account() TO authenticated;
 
 REVOKE ALL ON FUNCTION public.vote_story(UUID, UUID, TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.vote_story(UUID, UUID, TEXT) TO authenticated;
+
+-- 8. STORAGE
+INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true) ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Avatar images are publicly accessible." ON storage.objects;
+CREATE POLICY "Avatar images are publicly accessible." ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
+
+DROP POLICY IF EXISTS "Users can upload their own avatar." ON storage.objects;
+CREATE POLICY "Users can upload their own avatar." ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'avatars' AND auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Users can update their own avatar." ON storage.objects;
+CREATE POLICY "Users can update their own avatar." ON storage.objects FOR UPDATE USING (bucket_id = 'avatars' AND auth.uid() = owner);
+
+DROP POLICY IF EXISTS "Users can delete their own avatar." ON storage.objects;
+CREATE POLICY "Users can delete their own avatar." ON storage.objects FOR DELETE USING (bucket_id = 'avatars' AND auth.uid() = owner);

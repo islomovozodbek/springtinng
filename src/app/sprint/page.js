@@ -41,6 +41,46 @@ function SprintPageInner() {
   const dailyDate = searchParams.get("date") ?? null;
   const dailyPromptData = isDailyMode && dailyDate ? getDailyPrompt(dailyDate) : null;
 
+  const getStreakData = useCallback(() => {
+    if (!user) return { activeStreak: 0, multiplier: 1, bonusAura: 0, lapsed: false };
+    
+    let activeStreak = user.currentStreak || 0;
+    const todayUTC = new Date().toISOString().split("T")[0];
+    const yesterday = new Date(Date.UTC(
+      new Date().getUTCFullYear(),
+      new Date().getUTCMonth(),
+      new Date().getUTCDate() - 1
+    )).toISOString().split("T")[0];
+    const lastDailyDate = user.lastDailyDate ?? null;
+
+    let lapsed = false;
+
+    if (isDailyMode && dailyDate) {
+      if (lastDailyDate === yesterday) {
+        activeStreak += 1;
+      } else if (lastDailyDate !== dailyDate && lastDailyDate !== todayUTC) {
+        if (user.currentStreak > 0) lapsed = true;
+        activeStreak = 1;
+      }
+    } else {
+      if (lastDailyDate !== todayUTC && lastDailyDate !== yesterday) {
+        if (user.currentStreak > 0) lapsed = true;
+        activeStreak = 0;
+      }
+    }
+
+    const multiplier = activeStreak >= 3 ? 1.2 : 1;
+    let bonusAura = 0;
+
+    if (isDailyMode && dailyDate && activeStreak === 7 && user.currentStreak !== 7) {
+      bonusAura = 150;
+    }
+
+    return { activeStreak, multiplier, bonusAura, lapsed };
+  }, [user, isDailyMode, dailyDate]);
+
+  const { activeStreak, multiplier: streakMultiplier, bonusAura, lapsed } = getStreakData();
+
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
@@ -137,7 +177,10 @@ function SprintPageInner() {
     
     setIsPublishing(true);
     const wordCount = text.trim().split(/\s+/).length;
-    const auraGained = Math.floor((wordCount * 2) / 5);
+    
+    const baseAuraGained = Math.floor((wordCount * 2) / 5);
+    const auraGained = Math.floor(baseAuraGained * streakMultiplier) + bonusAura;
+    
     const timerMinutes = Math.floor(timerInitialRef.current / 60);
     const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
@@ -172,19 +215,7 @@ function SprintPageInner() {
 
         // 4. Compute updated streak
         const todayUTC = dailyDate;
-        const lastDailyDate = user.lastDailyDate ?? null;
-        const yesterday = new Date(Date.UTC(
-          new Date().getUTCFullYear(),
-          new Date().getUTCMonth(),
-          new Date().getUTCDate() - 1
-        )).toISOString().split("T")[0];
-
-        let newStreak = user.currentStreak || 0;
-        if (lastDailyDate === yesterday) {
-          newStreak += 1;
-        } else if (lastDailyDate !== todayUTC) {
-          newStreak = 1;
-        }
+        const newStreak = activeStreak;
         const newAura = (user.aura || 0) + auraGained;
         const newLongestStreak = Math.max(newStreak, user.longestStreak || 0);
         const updatedTotalStories = (user.totalStories || 0) + 1;
@@ -260,7 +291,7 @@ function SprintPageInner() {
         const updatedTotalStories = (user.totalStories || 0) + 1;
 
         // Compute achievements against the post-save stats
-        const postSaveUser = { ...user, totalStories: updatedTotalStories };
+        const postSaveUser = { ...user, totalStories: updatedTotalStories, currentStreak: activeStreak };
         const fullEarned = computeEarnedAchievements(postSaveUser, { wordCount, timerMinutes, isHardcore, isMobile });
         const newlyUnlockedIds = getNewlyUnlocked(user.earnedAchievements || [], fullEarned);
         const combinedAchievements = [...fullEarned];
@@ -272,6 +303,11 @@ function SprintPageInner() {
           level: Math.floor(newAura / 500) + 1,
           earned_achievements: combinedAchievements,
         };
+        
+        // If they lapsed and lost their streak, update the DB so they actually lose it
+        if (user.currentStreak > 0 && activeStreak === 0) {
+          profileUpdate.current_streak = 0;
+        }
 
         const { error: profileError } = await supabase
           .from("profiles")
@@ -286,6 +322,7 @@ function SprintPageInner() {
           totalStories: profileUpdate.total_stories,
           level: profileUpdate.level,
           earnedAchievements: combinedAchievements,
+          ...(user.currentStreak > 0 && activeStreak === 0 ? { currentStreak: 0 } : {})
         });
 
         // Show toasts for newly unlocked achievements
@@ -733,6 +770,17 @@ function SprintPageInner() {
                   </p>
                 </div>
 
+                {streakMultiplier > 1 && (
+                  <div style={{ marginTop: "16px", padding: "12px", background: "rgba(var(--accent-rgb), 0.1)", color: "var(--accent)", borderRadius: "8px", fontSize: "0.9rem", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                    🔥 {user.currentStreak} Day Streak! (1.2x Aura Active)
+                  </div>
+                )}
+                {lapsed && (
+                  <div style={{ marginTop: "16px", padding: "12px", background: "rgba(255, 59, 48, 0.1)", color: "var(--danger)", borderRadius: "8px", fontSize: "0.9rem", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                    💔 Streak Lost! Complete today's daily to start a new streak.
+                  </div>
+                )}
+
                 {hasHitLimit ? (
                   <div style={{ marginTop: "var(--space-xl)", padding: "24px", background: "var(--bg-secondary)", borderRadius: "12px", border: "1px solid var(--border)", textAlign: "center" }}>
                     <span style={{ fontSize: "1.8rem", display: "block", marginBottom: "12px" }}>🛑</span>
@@ -842,10 +890,25 @@ function SprintPageInner() {
               <span>Time</span>
             </div>
             <div className={styles.completeStat}>
-              <strong style={{ color: "var(--success)" }}>+{Math.floor((wordCount * 2) / 5)}</strong>
+              <strong style={{ color: "var(--success)", display: "flex", alignItems: "center", gap: "4px" }}>
+                +{Math.floor((Math.floor((wordCount * 2) / 5)) * streakMultiplier) + bonusAura} 
+                {streakMultiplier > 1 && <span style={{ fontSize: "0.8rem", color: "var(--accent)" }} title="1.2x Streak Bonus">🔥</span>}
+                {bonusAura > 0 && <span style={{ fontSize: "0.8rem", color: "var(--accent)" }} title="7-Day Streak Bonus">🎁</span>}
+              </strong>
               <span>Aura</span>
             </div>
           </div>
+          
+          {bonusAura > 0 && (
+             <div style={{ padding: "12px", background: "rgba(var(--accent-rgb), 0.15)", color: "var(--accent)", borderRadius: "8px", marginTop: "16px", fontWeight: "bold" }}>
+                🎉 7-Day Streak Achieved! +150 Bonus Aura!
+             </div>
+          )}
+          {streakMultiplier > 1 && bonusAura === 0 && (
+             <div style={{ fontSize: "0.85rem", color: "var(--accent)", marginTop: "8px", fontWeight: "600" }}>
+                🔥 1.2x Streak Multiplier Applied
+             </div>
+          )}
 
           <div style={{ margin: "32px 0", textAlign: "left", display: "flex", flexDirection: "column", gap: "16px" }}>
              <div className="input-group">

@@ -141,7 +141,11 @@ export default function ProfilePage() {
         {/* Profile Header */}
         <div className={styles.profileHeader}>
           <div className={styles.profileAvatar}>
-            {(profileUser.username || "U")[0].toUpperCase()}
+            {profileUser.photo_url ? (
+              <img src={profileUser.photo_url} alt="Avatar" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+            ) : (
+              (profileUser.username || "U")[0].toUpperCase()
+            )}
           </div>
           <div className={styles.profileInfo}>
             <div className={styles.profileName}>

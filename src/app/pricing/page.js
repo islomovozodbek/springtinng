@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "./pricing.module.css";
 import PageShapes from "@/components/PageShapes";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const HandCircle = () => (
   <svg className={styles.circleSvgStretched} viewBox="0 0 100 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,6 +20,10 @@ const HandCircle = () => (
 
 export default function PricingPage() {
   const [duration, setDuration] = useState("monthly"); // "monthly", "quarterly", "yearly"
+  const { user } = useAuth();
+  const router = useRouter();
+  const [loadingCheckout, setLoadingCheckout] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const getPricingLabels = () => {
     if (duration === "quarterly") {
@@ -44,6 +50,44 @@ export default function PricingPage() {
   };
 
   const currentPricing = getPricingLabels();
+
+  const handleCheckout = async () => {
+    if (!user) {
+      router.push("/register");
+      return;
+    }
+    
+    if (user.tier === "pro") {
+      setErrorMsg("You are already on the Pro tier!");
+      return;
+    }
+
+    setLoadingCheckout(true);
+    setErrorMsg("");
+    
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.uid,
+          email: user.email,
+          interval: duration,
+          returnUrl: window.location.origin + "/dashboard",
+        })
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || "Checkout setup failed");
+      
+      window.location.href = data.url;
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message || "Failed to connect to Stripe.");
+      setLoadingCheckout(false);
+    }
+  };
 
   return (
     <div className={styles.pricingPage}>
@@ -143,9 +187,20 @@ export default function PricingPage() {
                 </button>
               </div>
               
-              <Link href="/register">
-                <button className={`${styles.planBtn} ${styles.planBtnPrimary}`}>{currentPricing.btnText}</button>
-              </Link>
+              <div style={{ marginTop: "16px" }}>
+                {errorMsg && (
+                  <div style={{ color: "var(--danger)", fontSize: "0.85rem", marginBottom: "12px", textAlign: "center" }}>
+                    {errorMsg}
+                  </div>
+                )}
+                <button 
+                  className={`${styles.planBtn} ${styles.planBtnPrimary}`} 
+                  onClick={handleCheckout}
+                  disabled={loadingCheckout}
+                >
+                  {loadingCheckout ? "Redirecting..." : currentPricing.btnText}
+                </button>
+              </div>
             </div>
 
           </div>
