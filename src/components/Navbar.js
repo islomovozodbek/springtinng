@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
+import { PenTool, Star, Settings, Calendar, BookOpen, Trophy, ShoppingBag, Target, Search, Mail } from "lucide-react";
 import styles from "./Navbar.module.css";
 import NotificationsDropdown from "./NotificationsDropdown";
 
@@ -55,7 +56,7 @@ export default function Navbar() {
         <div className={styles.navInner}>
           {/* Logo */}
           <Link href={user && !user.needsOnboarding ? "/dashboard" : (user?.needsOnboarding ? "#" : "/")} className={styles.logo} onClick={closeMobile} style={{ cursor: user?.needsOnboarding ? "default" : "pointer" }}>
-            <span className={styles.logoIcon}>🖋️</span>
+            <span className={styles.logoIcon}><PenTool size={20} /></span>
             <span className={styles.logoText}>
               sprinting<span className={styles.logoHighlight}>.ink</span>
             </span>
@@ -121,12 +122,12 @@ export default function Navbar() {
               !user.needsOnboarding ? (
                 <>
                   <Link href={`/profile/${user.username}`} className={styles.auraBadge}>
-                    <span className={styles.auraIcon}>⭐</span>
+                    <span className={styles.auraIcon}><Star size={14} fill="currentColor" style={{ marginTop: -2 }} /></span>
                     {user.aura || 0}
                   </Link>
                   <NotificationsDropdown />
-                  <Link href="/settings" className="btn btn-ghost btn-sm">
-                    ⚙️
+                  <Link href="/settings" className="btn btn-ghost btn-sm" style={{ padding: "8px" }}>
+                    <Settings size={20} />
                   </Link>
                   <Link href={`/profile/${user.username}`} className={styles.navLink}>
                     <div className="avatar avatar-sm" style={{ marginRight: 4 }}>
@@ -202,17 +203,17 @@ export default function Navbar() {
       <div className={`${styles.mobileMenu} ${mobileOpen ? styles.open : ""}`}>
         {user ? (
           <>
-            <Link href="/sprint" className={styles.navLink} onClick={closeMobile}>✍️ Sprint</Link>
-            <Link href="/daily" className={styles.navLink} onClick={closeMobile}>🗓️ Daily Prompt</Link>
-            <Link href="/feed" className={styles.navLink} onClick={closeMobile}>📖 Feed</Link>
-            <Link href="/leaderboard" className={styles.navLink} onClick={closeMobile}>🏆 Leaderboards</Link>
-            <Link href="/shop" className={styles.navLink} onClick={closeMobile}>🛍️ Shop</Link>
-            <Link href="/achievements" className={styles.navLink} onClick={closeMobile}>🎯 Achievements</Link>
-            <Link href="/search" className={styles.navLink} onClick={closeMobile}>🔍 Search</Link>
-            <Link href="/referral" className={styles.navLink} onClick={closeMobile}>📨 Referrals</Link>
+            <Link href="/sprint" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><PenTool size={16} /> Sprint</div></Link>
+            <Link href="/daily" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Calendar size={16} /> Daily Prompt</div></Link>
+            <Link href="/feed" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><BookOpen size={16} /> Feed</div></Link>
+            <Link href="/leaderboard" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Trophy size={16} /> Leaderboards</div></Link>
+            <Link href="/shop" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><ShoppingBag size={16} /> Shop</div></Link>
+            <Link href="/achievements" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Target size={16} /> Achievements</div></Link>
+            <Link href="/search" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Search size={16} /> Search</div></Link>
+            <Link href="/referral" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Mail size={16} /> Referrals</div></Link>
             <div className={styles.navActions} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", padding: "0 16px" }}>
               <Link href={`/profile/${user.username}`} className={styles.auraBadge}>
-                <span className={styles.auraIcon}>⭐</span>
+                <span className={styles.auraIcon}><Star size={14} fill="currentColor" style={{ marginTop: -2 }} /></span>
                 {user.aura || 0}
               </Link>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>

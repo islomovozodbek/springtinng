@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
+import { Bell } from "lucide-react";
 import styles from "./NotificationsDropdown.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -113,7 +114,10 @@ export default function NotificationsDropdown() {
         onClick={() => setOpen(!open)}
         aria-label="Notifications"
       >
-        <span className={`${styles.dot} ${unreadCount > 0 ? styles.dotUnread : ""}`} />
+        <Bell size={20} strokeWidth={2} className={styles.bellIcon} />
+        {unreadCount > 0 && (
+          <span className={styles.badge}>{unreadCount > 9 ? "9+" : unreadCount}</span>
+        )}
       </button>
 
       {open && (

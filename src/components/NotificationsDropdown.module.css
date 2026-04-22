@@ -22,18 +22,27 @@
   background: var(--bg-hover, rgba(0,0,0,0.05));
 }
 
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  transition: all 0.3s ease;
+.bellIcon {
+  color: var(--text-primary);
+  transition: color 0.2s ease;
 }
 
-.dotUnread {
+.bellBtn:hover .bellIcon {
+  color: var(--accent);
+}
+
+.badge {
+  position: absolute;
+  top: 0px;
+  right: 0px;
   background: var(--danger);
-  animation: pulse-dot-nav 2s ease-in-out infinite;
-  box-shadow: 0 0 8px var(--danger);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 10px;
+  line-height: 1;
+  border: 2px solid var(--bg-surface);
 }
 
 .dropdown {
