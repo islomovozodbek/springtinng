@@ -56,7 +56,6 @@ export default function Navbar() {
         <div className={styles.navInner}>
           {/* Logo */}
           <Link href={user && !user.needsOnboarding ? "/dashboard" : (user?.needsOnboarding ? "#" : "/")} className={styles.logo} onClick={closeMobile} style={{ cursor: user?.needsOnboarding ? "default" : "pointer" }}>
-            <span className={styles.logoIcon}><PenTool size={20} /></span>
             <span className={styles.logoText}>
               sprinting<span className={styles.logoHighlight}>.ink</span>
             </span>
