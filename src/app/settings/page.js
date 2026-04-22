@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import PageShapes from "@/components/PageShapes";
 
 export default function SettingsPage() {
-  const { user, loading, login, logout } = useAuth();
+  const { user, loading, updateLocalUser, logout } = useAuth();
   const router = useRouter();
 
   const [username, setUsername] = useState("");
@@ -46,8 +46,12 @@ export default function SettingsPage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       
-      // In a real app we'd trigger a reload of context here, 
-      // but a page refresh works for now to see changes.
+      // Update local state so Navbar and other components see the change immediately
+      updateLocalUser({ 
+        username: username.toLowerCase(), 
+        displayName: displayName, 
+        bio: bio 
+      });
     } catch (err) {
       console.error("Error updating profile:", err);
       alert("Failed to save profile: " + err.message);
