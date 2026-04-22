@@ -108,6 +108,8 @@
 }
 
 .auraIcon {
+  display: flex;
+  align-items: center;
   font-size: 0.9rem;
   filter: drop-shadow(0 0 2px rgba(244, 208, 63, 0.3));
 }

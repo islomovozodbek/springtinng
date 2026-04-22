@@ -121,7 +121,7 @@ export default function Navbar() {
               !user.needsOnboarding ? (
                 <>
                   <Link href={`/profile/${user.username}`} className={styles.auraBadge}>
-                    <span className={styles.auraIcon}><Star size={14} fill="currentColor" style={{ marginTop: -2 }} /></span>
+                    <span className={styles.auraIcon}><Star size={14} fill="currentColor" /></span>
                     {user.aura || 0}
                   </Link>
                   <NotificationsDropdown />
@@ -212,7 +212,7 @@ export default function Navbar() {
             <Link href="/referral" className={styles.navLink} onClick={closeMobile}><div style={{display: 'flex', alignItems: 'center', gap: '8px'}}><Mail size={16} /> Referrals</div></Link>
             <div className={styles.navActions} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", padding: "0 16px" }}>
               <Link href={`/profile/${user.username}`} className={styles.auraBadge}>
-                <span className={styles.auraIcon}><Star size={14} fill="currentColor" style={{ marginTop: -2 }} /></span>
+                <span className={styles.auraIcon}><Star size={14} fill="currentColor" /></span>
                 {user.aura || 0}
               </Link>
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
