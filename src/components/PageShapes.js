@@ -110,6 +110,54 @@ function Horizon({ rng, posStyle, tier }) {
 
 
 /**
+ * Spiral — a hand-drawn looking spiral that draws outward
+ */
+function Spiral({ rng, posStyle, tier }) {
+  const rMax = tier === "dominant" ? 140 + rng() * 40 : 80 + rng() * 30;
+  const turns = 2.5 + rng() * 1.5;
+  const points = [];
+  const cx = rMax + 20;
+  const cy = rMax + 20;
+  
+  const steps = 150;
+  const maxAngle = turns * Math.PI * 2;
+  
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const angle = t * maxAngle;
+    const r = (t * rMax) + (rng() - 0.5) * 4 * t;
+    const x = cx + Math.cos(angle) * r;
+    const y = cy + Math.sin(angle) * r;
+    points.push(`${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+
+  const d = points.join(" ");
+  const size = (rMax + 20) * 2;
+  const dashLen = Math.PI * rMax * turns * 1.5; // Approximation for animation
+
+  return (
+    <svg
+      className={`${styles[tier]} ${styles.ensoAnim}`}
+      style={{ "--dash-len": dashLen, ...posStyle, width: size, height: size }}
+      viewBox={`0 0 ${size} ${size}`}
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d={d}
+        stroke="var(--shape-accent)"
+        strokeWidth={tier === "dominant" ? "2.5" : "1.5"}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+
+
+/**
  * BigArc — a quarter-to-third of a very large circle. Draws in, holds.
  */
 function BigArc({ rng, posStyle, tier }) {
@@ -291,7 +339,7 @@ const PAGE_DESIGNS = {
   leaderboard: { dominant: "enso",         subtle: "dotGrid9" },
   dashboard:   { dominant: "bigArc",       subtle: null },
   achievements:{ dominant: "enso",         subtle: "vertStroke" },
-  profile:     { dominant: "horizon",      subtle: "dotPair" },
+  profile:     { dominant: "spiral",       subtle: "dotPair" },
   sprint:      { dominant: "bigArc",       subtle: "dotPair" },
   search:      { dominant: "tripleStroke", subtle: "dotPair" },
   settings:    { dominant: "enso",         subtle: "dotPair" },
@@ -327,6 +375,7 @@ function renderShape(type, rng, posStyle, tier, key) {
   switch (type) {
     case "enso":        return <Enso        key={key} rng={rng} posStyle={posStyle} tier={tier} />;
     case "horizon":     return <Horizon     key={key} rng={rng} posStyle={posStyle} tier={tier} />;
+    case "spiral":      return <Spiral      key={key} rng={rng} posStyle={posStyle} tier={tier} />;
     case "bigArc":      return <BigArc      key={key} rng={rng} posStyle={posStyle} tier={tier} />;
     case "dotPair":     return <DotPair     key={key} rng={rng} posStyle={posStyle} />;
     case "dotGrid9":    return <DotGrid9    key={key} posStyle={posStyle} />;
