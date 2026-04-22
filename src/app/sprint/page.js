@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { toPng } from "html-to-image";
 import PageShapes from "@/components/PageShapes";
-import { getRandomPrompt, CATEGORIES } from "@/data/prompts";
+import { getRandomPrompt } from "@/data/prompts";
 import { getDailyPrompt } from "@/data/dailyPrompts";
 import NinjaCursor from "@/components/NinjaCursor";
 import styles from "./sprint.module.css";

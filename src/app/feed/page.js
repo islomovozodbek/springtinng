@@ -314,7 +314,7 @@ export default function FeedPage() {
             ))
           ) : (
             <div style={{ textAlign: "center", padding: "100px", color: "var(--text-muted)" }}>
-              <p>No stories found. Try a different search or category.</p>
+              <p>No stories found. Try a different search.</p>
             </div>
           )}
         </main>

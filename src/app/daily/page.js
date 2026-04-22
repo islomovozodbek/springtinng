@@ -131,7 +131,7 @@ export default function DailyPage() {
       const { data: upserted, error: upsertErr } = await supabase
         .from("daily_prompts")
         .upsert(
-          { prompt_date: today, prompt_id: todayPrompt.id, prompt_text: todayPrompt.text, prompt_category: todayPrompt.category },
+          { prompt_date: today, prompt_id: todayPrompt.id, prompt_text: todayPrompt.text },
           { onConflict: "prompt_date", ignoreDuplicates: true }
         )
         .select()
@@ -189,7 +189,7 @@ export default function DailyPage() {
       console.error("Daily init error:", err);
     }
     setLoading(false);
-  }, [user, today, todayPrompt.id, todayPrompt.text, todayPrompt.category]);
+  }, [user, today, todayPrompt.id, todayPrompt.text]);
 
   useEffect(() => {
     if (!authLoading) initialize();

@@ -134,7 +134,7 @@ export default function Home() {
         <div className={`container ${styles.splitGrid}`}>
           <div className={styles.splitContent}>
             <ScrollReveal animation="slideRight" delay={100}>
-              <h2>The Fog of War (TEST).</h2>
+              <h2>The Fog of War.</h2>
               <p>
                 Perfectionism is the enemy of the first draft. In Sprinting Ink, as you type, your older sentences blur out like drying ink. You can&apos;t go back to edit them. You can only move forward.
               </p>

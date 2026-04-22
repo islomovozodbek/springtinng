@@ -532,40 +532,17 @@ const PROMPTS = [
   { "id": 1030, "text": "The prophecy foretold of a hero who could read an entire terms and conditions agreement..." }
 ];
 
-const CATEGORIES = [
-  { id: "all", label: "All Categories", icon: "🎲" },
-  { id: "mystery", label: "Mystery & Thriller", icon: "🔍" },
-  { id: "humor", label: "Humor & Absurd", icon: "😂" },
-  { id: "scifi", label: "Sci-Fi & Fantasy", icon: "🚀" },
-  { id: "romance", label: "Romance & Drama", icon: "💕" },
-  { id: "horror", label: "Horror & Creepy", icon: "👻" },
-  { id: "slice", label: "Slice of Life", icon: "☕" },
-  { id: "philosophy", label: "Philosophy & Deep", icon: "🧠" },
-  { id: "adventure", label: "Adventure", icon: "🗺️" },
-  { id: "historical", label: "Historical", icon: "📜" },
-  { id: "meta", label: "Meta & Writing", icon: "✍️" },
-];
-
-export function getRandomPrompt(category = "all") {
+export function getRandomPrompt() {
   // 5% chance of Brainrot override
   const wantsBrainrot = Math.random() < 0.05;
 
   if (wantsBrainrot) {
-    const brainrotPrompts = PROMPTS.filter(p => p.category === "brainrot");
+    const brainrotPrompts = PROMPTS.filter(p => p.id >= 1000);
     return brainrotPrompts[Math.floor(Math.random() * brainrotPrompts.length)];
   }
 
-  const normalPrompts = PROMPTS.filter(p => p.category !== "brainrot");
-  const filtered = category === "all" 
-    ? normalPrompts 
-    : normalPrompts.filter(p => p.category === category);
-    
-  return filtered[Math.floor(Math.random() * filtered.length)];
+  const normalPrompts = PROMPTS.filter(p => p.id < 1000);
+  return normalPrompts[Math.floor(Math.random() * normalPrompts.length)];
 }
 
-export function getCategoryLabel(categoryId) {
-  const cat = CATEGORIES.find(c => c.id === categoryId);
-  return cat ? cat.label : categoryId;
-}
-
-export { PROMPTS, CATEGORIES };
+export { PROMPTS };

@@ -1,6 +1,6 @@
 .pageWrapper {
   overflow: hidden;
-  background-color: red !important;
+  background-color: var(--bg-primary);
 }
 
 /* ── Hero ── */

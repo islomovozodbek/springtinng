@@ -94,7 +94,7 @@ export default function DashboardPage() {
           content: sprint.content,
           starter_sentence: sprint.starter_sentence,
           word_count: wordCount,
-          category: sprint.category,
+
           time_mode: sprint.time_mode,
           net_score: 0,
           upvoters: [],
@@ -153,7 +153,7 @@ export default function DashboardPage() {
           title: row.title,
           content: row.content,
           wordCount: row.word_count,
-          category: row.category,
+
           createdAt: row.created_at,
           isHidden: row.is_hidden,
           netScore: row.net_score,
